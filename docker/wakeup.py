@@ -7,13 +7,12 @@ import configparser
 
 # 获取脚本的绝对路径
 script_path = os.path.abspath(__file__)
-# 获取脚本所在的目录
-script_dir = os.path.dirname(script_path)
-# 修改当前工作目录到脚本所在目录
-os.chdir(script_dir)
+
+# 获取同级目录下的文件的绝对路径
+config_path = os.path.join(os.path.dirname(script_path), 'config.ini')
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(config_path)
 
 # 巴法云私钥
 client_id = config.get('bafa', 'client_id').strip('"')

@@ -1,7 +1,7 @@
 # 利用小爱同学唤醒局域网PC（docker/iStoreOS）
 <hr style='border-top-style: dotted !important;'>
 
-### 一、使用docker 
+### 一、使用docker
 
 ---
 #### （一）本地构建
@@ -19,7 +19,7 @@ RUN apk add --no-cache python3 curl openssh wakeonlan cronie sshpass
 COPY wakeup.py /wakeup.py
 # 使脚本可执行
 RUN chmod +x /wakeup.py
-  
+
 # 复制配置文件
 COPY config.ini /config.ini
 
@@ -271,3 +271,9 @@ cd /etc/wakeup/; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup
 
 - 可能原因
   - 将启动项和计划任务的命令单独放在终端中，查看是否正常启动，是否有报错，再重启尝试。
+
+#### （二）iStoreOS可以启动电脑无法关闭电脑
+- 可能原因
+  - 查看wakeup.py同级目录下是否有log.txt日志生成，查看日志内容排除故障
+  - 如果日志显示：Host '主机IP' is not in the trusted hosts file. 则需要进入isos终端，在目标PC开机的状态下进行一次ssh连接，连接后自动添加为可信。
+    - 如果还是不行，查看是否是类似于(ssh-ed25519 fingerprint SHA256:XbhC....)的提示，去网页，卸载掉ssh相关的软件包，重新安装openssh-client sshpass
