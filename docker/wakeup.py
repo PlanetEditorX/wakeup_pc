@@ -5,6 +5,13 @@ import time
 import os
 import configparser
 
+# 获取脚本的绝对路径
+script_path = os.path.abspath(__file__)
+# 获取脚本所在的目录
+script_dir = os.path.dirname(script_path)
+# 修改当前工作目录到脚本所在目录
+os.chdir(script_dir)
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
