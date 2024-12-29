@@ -251,7 +251,7 @@ cd /etc/wakeup/; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup
 
 ---
 
-#### （一）iStoreOS
+#### （二）iStoreOS
 
 ##### 优势
 
