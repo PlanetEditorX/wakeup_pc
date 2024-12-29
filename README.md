@@ -261,4 +261,4 @@ cd /etc/wakeup/; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup
 ##### 劣势
 
 - 配置较慢，较繁琐
-- 可能存在使用不能Openwrt版本而出现有人配置成功有人配置不成功的情况
+- 可能存在使用不同Openwrt版本而出现有人配置成功，有人配置不成功或并不知道自己哪里出错的情况
