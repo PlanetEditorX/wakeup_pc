@@ -74,16 +74,16 @@ docker exec -it wakeup_pc sh
 docker pull yexundao/wakeup_pc:latest
 ```
 ##### 2. 创建配置文件
-（1）在指定位置创建config.ini文件，如：/root/docker/config.ini
+（1）在指定位置创建config.ini文件，如：/vol1/1000/docker/wakeup/config.ini
 （2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
 
 ##### 3. 运行镜像
 ```bash
-docker run -d --restart=unless-stopped --name wakeup_pc --network host -v /root/docker/config.ini:/config.ini yexundao/wakeup_pc:latest
+docker run -d --restart=unless-stopped --name wakeup_pc --network host -v /vol1/1000/docker/wakeup/config.ini:/config.ini yexundao/wakeup_pc:latest
 ```
 
 - 需要先根据自己的具体信息配置好config.ini文件
-- 将运行命令中`/root/docker/config.ini`修改为自己实际地址
+- 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际地址
 
 
 <hr style='border-top-style: dotted !important;'>
