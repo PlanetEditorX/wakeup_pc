@@ -218,13 +218,13 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
  ![](attachment/1b91baf838aa7f42fae647cbe44eb63688bb7db29e8fe8121ff9380833502aa8.png)
 
- ![](attachment/2048749d756d0620cbcec5d8046c66b71b8664f3c5463d0c8840ca4cd9498868.png)
+
 
 ##### 2. 找到并添加巴法
 
  ![](attachment/0dfe2b99f0ec93a1c0550d43e3e0f30cf9097e6bd90f43665b740aa357a00597.png)
 
- ![](attachment/05d4407501a626a09591480568f853922f1b3619d1a7fec6a24a4add9b4ddb2c.png)
+
 
 ##### 3. 可以看到有在网页上命名的电脑设备，点击同步设备
 
