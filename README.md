@@ -179,13 +179,20 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ##### 1. <span class='custom-title-span'>避免多用户时会在登录页面显示不需要的用户，参考https://www.ithome.com/0/228/192.htm</span>
 ##### 2. 确认要隐藏账户全名
 （1）在开始按钮单击右键，选择“计算机管理”
+
 （2）进入系统工具→本地用户和组→用户，在中间找到目标用户账户名
+
 （3）记录好账户全名（本地账户没有“全名”，记录好“名称”即可）
+
 ##### 3. 新建注册表特殊账户
 （1）win+r输入regedit后回车进入注册表编辑器
+
 （2）定位到`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`
+
 （3）在Winlogon单击右键新建“项”，命名为SpecialAccounts
+
 （4）在SpecialAccounts单击右键新建“项”，命名为UserList
+
 （5）在UserList单击右键新建DWORD（32位）值（如上图），命名为第一步中记录的账户全名（或本地账户名称），数值数据保持默认的0，此时进入锁屏，隐藏用户不可见。
 
 ![](attachment/d8091cddf27cd78b38327d115f504c9df0e7e3eb4541e34fc8785fbc35c12258.png)
