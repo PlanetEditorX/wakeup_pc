@@ -131,7 +131,7 @@ opkg install wakeonlan python3 sshpass
 #### （五）开机启动
 - 在系统-启动项-本地启动脚本中添加代码，让其开机启动
 ```bash
-cd /etc/wakeup/; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
+nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ```
  ![](attachment/97d06dbdbc6cd4a8c430f8a23be76cbd9ddf3c5751cab18a2717b2e059826f8e.png)
 
@@ -262,6 +262,7 @@ cd /etc/wakeup/; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup
 
 - 配置较慢，较繁琐
 - 可能存在使用不同Openwrt版本而出现有人配置成功，有人配置不成功或并不知道自己哪里出错的情况
+- 可能会出现用着用着突然无法使用的情况，重启也没用，软件包重装又正常.......
 
 ### 六、故障排除（更新...）
 
