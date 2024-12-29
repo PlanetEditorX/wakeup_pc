@@ -1,8 +1,7 @@
 FROM alpine:latest
 
-# 安装 Python
-RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 #安装必要依赖
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 RUN apk update
 RUN apk add --no-cache python3 curl openssh wakeonlan cronie sshpass
 
