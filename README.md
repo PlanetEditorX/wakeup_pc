@@ -1,4 +1,4 @@
-# 利用小爱同学唤醒局域网PC（docker/iStoreOS）
+# 利用小爱同学控制局域网电脑开关机（docker/iStoreOS）
 <hr style='border-top-style: dotted !important;'>
 
 ### 一、使用docker
