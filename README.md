@@ -52,7 +52,7 @@ docker images
 ##### 3. 创建配置文件
 - 从仓库https://github.com/PlanetEditorX/wakeup_pc/tree/main/docker 中获取并保存在Linux主机上
     ![](attachment/6bf0e7d8b2602710526d63e25efd9d385cd60c4f5a804008d3124d18ec03f8a0.png)
-- config.ini见远程拉取的配置文件说明
+- config.ini详情见远程拉取和iStoreOS的配置文件相关说明
 ##### 4. 运行 Docker 容器
 ```bash
 docker run -d --restart=unless-stopped --name wakeup_pc --network host wakeup_pc
