@@ -30,7 +30,7 @@ docker run -d \
 - 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际配置文件地址
 
 
-<hr style='border-top-style: dotted !important;'>
+---
 
 #### （二）本地构建
 ##### 1. 创建 Dockerfile
@@ -155,7 +155,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 #### （七）生效操作
 - 重启或来到系统-启动项-启动脚本，ctrl+f 搜索 cron，并点击重启，使计划任务生效
 
-<hr style='border-top-style: dotted !important;'>
+---
 
 ### 三、SSH服务器配置
 
@@ -204,7 +204,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 ![](attachment/d8091cddf27cd78b38327d115f504c9df0e7e3eb4541e34fc8785fbc35c12258.png)
 
-<hr style='border-top-style: dotted !important;'>
+---
 
 #### （五）权限限制（可选）
 ##### 1. <span class='custom-title-span'>适当的限制权限，避免别人获取这个账号后用这个账号使用电脑，参考[https://www.ithome.com/0/228/192.htm](https://post.smzdm.com/p/akxwkxqk/)</span>
@@ -249,7 +249,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
  ![](attachment/d0384a2c56040ca76088d0b29629b6e648bdfd12da51b0c567540a3e57ca1e35.png)
 
-<hr style='border-top-style: dotted !important;'>
+---
 
 ### 五、docker和iStoreOS对比
 
@@ -283,7 +283,74 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 - 可能存在使用不同Openwrt版本而出现有人配置成功，有人配置不成功或并不知道自己哪里出错的情况
 - 可能会出现用着用着突然无法使用的情况，重启也没用，软件包重装又正常.......
 
-### 六、故障排除（更新...）
+---
+
+### 六、更新docker镜像
+
+---
+
+#### （一）创建工作流
+
+##### 触发
+
+```dockerfile
+on:
+  push:
+    tags:
+      - "v*"
+```
+- 打上`V*`标签并推送自动触发操作
+  ```bash
+  git tag -a v1.8.0 -m "Release version 1.8.0"
+  git push --tags
+  ```
+  - 根据需要修改`v1.8.0`→`va.b.c`和之后的描述
+  - `v1.8.0`/`va.b.c`在工作流中将会提取`1.8.0`/`a.b.c`作为标签打在镜像上，镜像上将会用时有tags：`1.8.0`/`a.b.c`和`latest`
+
+##### 标签的获取
+```dockerfile
+- name: Extract metadata (tags, labels) for Docker
+  id: meta
+  uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  with:
+    images: 用户名/镜像名字
+    tags: |
+          type=semver,pattern={{version}}
+          type=raw,value=latest
+```
+- 根据实际参数修改对应的名字，可直接在Docker Hub的镜像发布页查看
+
+##### Docker Hub的登录
+```dockerfile
+- name: Log in to Docker Hub
+  uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+  with:
+    username: ${{ secrets.DOCKER_USERNAME }}
+    password: ${{ secrets.DOCKER_PASSWORD }}
+```
+- 账号配置
+  - Settings→Security→Secrets and variables→Actions→Repository secrets→New repository secret
+  - Name为参数名，Secret为具体的值
+  - 用户名参数为：Name：DOCKER_USERNAME，Secret：Docker Hub的用户名
+  - 密码参数为：Name：DOCKER_PASSWORD，Secret：Docker Hub的密码
+
+##### 运行目录的配置
+```dockerfile
+- name: Build and push Docker image
+  id: push
+  uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+  with:
+    context: ./docker
+    file: ./docker/Dockerfile
+    push: true
+    tags: ${{ steps.meta.outputs.tags }}
+    labels: ${{ steps.meta.outputs.labels }}
+```
+- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改context和file为对应的路径
+
+---
+
+### 七、故障排除（更新...）
 
 ---
 
