@@ -331,8 +331,8 @@ on:
 - 账号配置
   - Settings→Security→Secrets and variables→Actions→Repository secrets→New repository secret
   - Name为参数名，Secret为具体的值
-  - 用户名参数为：Name：DOCKER_USERNAME，Secret：Docker Hub的用户名
-  - 密码参数为：Name：DOCKER_PASSWORD，Secret：Docker Hub的密码
+  - 用户名参数为：`Name`：`DOCKER_USERNAME`，`Secret`：`Docker Hub的用户名`
+  - 密码参数为：`Name`：`DOCKER_PASSWORD`，`Secret`：`Docker Hub的密码`
 
 ##### 运行目录的配置
 ```dockerfile
