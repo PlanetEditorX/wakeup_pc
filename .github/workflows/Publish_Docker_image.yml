@@ -55,5 +55,5 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ secrets.DOCKER_USERNAME }}/wakeup_pc
+          subject-digest: yexundao/wakeup_pc
           push-to-registry: true
