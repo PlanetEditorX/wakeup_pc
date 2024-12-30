@@ -1,6 +1,7 @@
-FROM alpine:3.21.0
-
-#安装必要依赖
+FROM alpine:3.18.6
+# 设置环境变量以确保 Python 输出实时打印，而不是被缓冲。
+ENV PYTHONUNBUFFERED=1
+# 安装必要依赖
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
     apk add --no-cache python3 curl openssh wakeonlan cronie sshpass
