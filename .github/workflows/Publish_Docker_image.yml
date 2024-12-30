@@ -11,8 +11,8 @@ name: Publish Docker image
 
 on:
   push:
-    branches:
-      - latest
+    # branches:
+    #   - latest
     tags:
       - "v*"
 jobs:
@@ -39,7 +39,9 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: yexundao/wakeup_pc
-
+        tags: |
+              type=semver,pattern={{version}}
+              type=raw,value=latest
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
