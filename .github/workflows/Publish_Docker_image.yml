@@ -36,7 +36,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: yexundao/wakeup_pc
+          images: ${{ secrets.DOCKER_USERNAME }}/wakeup_pc
 
       - name: Build and push Docker image
         id: push
@@ -52,5 +52,5 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-digest: ${{ secrets.DOCKER_USERNAME }}/wakeup_pc
           push-to-registry: true
