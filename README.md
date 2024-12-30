@@ -259,7 +259,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ##### 劣势
 
 - 占用空间较大（100MB左右）
-- 需要提前配置好docker网络环境
+- 需要提前配置好docker网络环境，需要一点点docker相关的知识或能根据故障自己进行搜索排查
 
 
 ---
@@ -269,7 +269,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ##### 优势
 
 - 软件利用率高，本身系统安装的软件包在其它程序也可以使用
-- 占用空间较小，安装快速
+- 新增占用空间较小，安装快速
 
 ##### 劣势
 
@@ -286,8 +286,13 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 - 可能原因
   - 将启动项和计划任务的命令单独放在终端中，查看是否正常启动，是否有报错，再重启尝试。
 
-#### （二）iStoreOS可以启动电脑无法关闭电脑
+#### （二）iStoreOS可以唤醒电脑无法关闭电脑
 - 可能原因
   - 查看wakeup.py同级目录下是否有log.txt日志生成，查看日志内容排除故障
   - 如果日志显示：Host '主机IP' is not in the trusted hosts file. 则需要进入isos终端，在目标PC开机的状态下进行一次ssh连接，连接后自动添加为可信。
     - 如果还是不行，查看是否是类似于(ssh-ed25519 fingerprint SHA256:XbhC....)的提示，去网页，卸载掉ssh相关的软件包，重新安装openssh-client sshpass
+
+#### （三）docker无法唤醒电脑
+- 可能原因
+  - 进入容器内部，手动执行唤醒代码，如失败则说明可能是docker的网络环境出问题，无法访问到局域网设备，检查并重新设置docker网络配置
+
