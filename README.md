@@ -114,11 +114,11 @@ docker run -d \
 ##### 3. 主题值/topic
 - ![](attachment/ec00e02c5afe8156849b147c4dc67ef840b8883d6697d428f58d8cfafe26287e.png)
 ##### 4. 设备MAC地址/mac
-（1）需要唤醒的设备输入：ipconfig /all，找到支持唤醒的网卡的物理地址，注意：如果显示的物理地址为XX-XX-XX-XX-XX-XX，需要将短横杠替换为冒号，XX:XX:XX:XX:XX:XX
+（1）需要唤醒的设备输入：`ipconfig /all`，找到支持唤醒的网卡的物理地址，注意：如果显示的物理地址为XX-XX-XX-XX-XX-XX，需要将短横杠替换为冒号，XX:XX:XX:XX:XX:XX
 ![](attachment/b0ac334a7df49d4540ffb28c251eb3249de04ebf240f8f7b362bac89e737e053.png)
 
 ##### 5. 远程电脑IP地址/ip
-（1）需要唤醒的设备输入：ipconfig，根据自己的网卡找到IP地址
+（1）需要唤醒的设备输入：`ipconfig`，根据自己的网卡找到IP地址
  ![](attachment/ccbf0a8dbf57c64da091c6cb5d15499633906e866843e7bc5a910b25a457d3fa.png)
 
 ##### 6. 远程SSH用户账号/user
