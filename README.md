@@ -160,7 +160,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ---
 #### （一）启用OpenSSH
 1. 设置—系统—可选功能—添加功能—OpenSSH服务器
-2. 不成功参考 https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=powershell或网上查找其它解决办法
+2. 不成功参考 https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=powershell 或网上查找其它解决办法
  ![](attachment/eaac19363e418ae7c52b5437ca8420638b6d0c20e73562bb7bc0c7ed85ebfcf8.png)
 
 ---
