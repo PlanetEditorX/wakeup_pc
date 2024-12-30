@@ -196,11 +196,11 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 （2）定位到`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`
 
-（3）在Winlogon单击右键新建“项”，命名为SpecialAccounts
+（3）在`Winlogon`单击右键新建“项”，命名为`SpecialAccounts`
 
-（4）在SpecialAccounts单击右键新建“项”，命名为UserList
+（4）在`SpecialAccounts`单击右键新建“项”，命名为`UserList`
 
-（5）在UserList单击右键新建DWORD（32位）值（如上图），命名为第一步中记录的账户全名（或本地账户名称），数值数据保持默认的0，此时进入锁屏，隐藏用户不可见。
+（5）在`UserList`单击右键`新建DWORD（32位）值`（如上图），命名为第一步中记录的账户全名（或本地账户名称），数值数据保持默认的0，此时进入锁屏，隐藏用户不可见。
 
 ![](attachment/d8091cddf27cd78b38327d115f504c9df0e7e3eb4541e34fc8785fbc35c12258.png)
 
