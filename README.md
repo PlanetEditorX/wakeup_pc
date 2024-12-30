@@ -330,7 +330,7 @@ on:
 ```
 - 账号配置
   - Settings→Security→Secrets and variables→Actions→Repository secrets→New repository secret
-  - Name为参数名，Secret为具体的值
+  - `Name`为参数名，`Secret`为具体的值
   - 用户名参数为：`Name`：`DOCKER_USERNAME`，`Secret`：`Docker Hub的用户名`
   - 密码参数为：`Name`：`DOCKER_PASSWORD`，`Secret`：`Docker Hub的密码`
 
@@ -346,7 +346,7 @@ on:
     tags: ${{ steps.meta.outputs.tags }}
     labels: ${{ steps.meta.outputs.labels }}
 ```
-- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改context和file为对应的路径
+- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改`context`和`file`为对应的路径
 
 ---
 
