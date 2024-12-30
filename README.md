@@ -169,7 +169,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ##### 2. 打开编辑本地用户和组：win+r，输入lusrmgr.msc
 -  ![](attachment/fbaebcdf0446ed068154bd1fcfc1a432d60d2758b242dc701a5dad9929907b56.png)
 ##### 3. <span class='custom-title-span'>输入用户名和密码，此处的用户名和密码就是SSH的用户名和密码，添加到配置的user和password</span>
-##### 4. <span class='custom-title-span'>取消用户下次登录时须更改密码（M）的勾选</span>
+##### 4. <span class='custom-title-span'>取消用户下次登录时须更改密码（M）的勾选，勾选用户不能更改密码(S)和密码永不过期(W)</span>
 
 ---
 #### （三）测试用户
@@ -203,6 +203,10 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ![](attachment/d8091cddf27cd78b38327d115f504c9df0e7e3eb4541e34fc8785fbc35c12258.png)
 
 <hr style='border-top-style: dotted !important;'>
+
+#### （五）权限限制（可选）
+##### 1. <span class='custom-title-span'>适当的限制权限，避免别人获取这个账号后用这个账号使用电脑，参考[https://www.ithome.com/0/228/192.htm](https://post.smzdm.com/p/akxwkxqk/)</span>
+##### 2. 按教程走，主要就是 `限制此用户登录到系统上：“拒绝本地登录”和“拒绝通过远程桌面服务登录”`，避免有意或无意中登录电脑，在电脑中留下无用的用户文件
 
 ### 四、巴法云
 
