@@ -89,7 +89,7 @@ docker run -d \
 ```
 
 - 需要先根据自己的具体信息配置好config.ini文件
-- 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际地址
+- 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际配置文件地址
 
 
 <hr style='border-top-style: dotted !important;'>
