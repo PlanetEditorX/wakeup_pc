@@ -99,7 +99,7 @@ docker run -d \
 
 ---
 #### （一）创建文件夹
-> - 在任意位置创建文件夹，如：mkdir /etc/wakeup
+> - 在任意位置创建文件夹，如：  `mkdir /etc/wakeup`
 
 ---
 #### （二）上传配置文件
