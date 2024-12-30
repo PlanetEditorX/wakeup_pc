@@ -363,7 +363,7 @@ on:
 - 排查故障
   - 查看wakeup.py同级目录下是否有log.txt日志生成，查看日志内容排除故障
 - 可能原因
-  - 如果日志显示：Host '主机IP' is not in the trusted hosts file. 则需要进入isos终端，在目标PC开机的状态下进行一次ssh连接，连接后自动添加为可信。
+  - 如果日志显示：Host '主机IP' is not in the trusted hosts file. 则需要进入iStoreOS终端，在目标PC开机的状态下进行一次ssh连接，连接后自动添加为可信。
     - 如果还是不行，查看是否是类似于(ssh-ed25519 fingerprint SHA256:XbhC....)的提示，去网页，卸载掉ssh相关的软件包，重新安装openssh-client sshpass
 
 #### （三）docker无法唤醒电脑
