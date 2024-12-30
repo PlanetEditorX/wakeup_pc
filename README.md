@@ -1,10 +1,38 @@
 # 利用小爱同学控制局域网电脑开关机（docker/iStoreOS）
-<hr style='border-top-style: dotted !important;'>
+
+---
 
 ### 一、使用docker
 
 ---
-#### （一）本地构建
+
+#### （一）远程拉取（推荐）
+##### 1. 拉取镜像
+```bash
+docker pull yexundao/wakeup_pc:latest
+```
+##### 2. 创建配置文件
+（1）在指定位置创建config.ini文件，如：`/vol1/1000/docker/wakeup/config.ini`
+
+（2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
+
+##### 3. 运行镜像
+```bash
+docker run -d \
+  --name wakeup_pc \
+  -v /vol1/1000/docker/wakeup/config.ini:/config.ini \
+  --restart always \
+  --network host \
+  yexundao/wakeup_pc:latest
+```
+
+- 需要先根据自己的具体信息配置好config.ini文件
+- 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际配置文件地址
+
+
+<hr style='border-top-style: dotted !important;'>
+
+#### （二）本地构建
 ##### 1. 创建 Dockerfile
 - 创建一个Dockerfile来构建alpine 容器，并在其中设置你的 Python 脚本。
 ```Dockerfile
@@ -62,38 +90,12 @@ docker run -d --restart=unless-stopped --name wakeup_pc --network host wakeup_pc
 - --restart=unless-stopped：参数，设置容器的重启策略。unless-stopped 意味着容器将自动重启除非它被明确停止（例如，通过 docker stop）或者 Docker 本身被停止。
 - --name wakeup_pc：参数，为容器指定一个名称，这里是 wakeup_pc。
 - --network host：参数，将容器的网络设置为 host 模式，这意味着容器将不会获得自己的网络接口，而是使用宿主机的网络接口，这样才能访问局域网的主机进行开机和关机操作。
-##### 5. 进入容器
+##### 5. 进入容器进行数据查看和排查故障
 ```bash
 docker exec -it wakeup_pc sh
 ```
 
 ---
-#### （二）远程拉取
-##### 1. 拉取镜像
-```bash
-docker pull yexundao/wakeup_pc:latest
-```
-##### 2. 创建配置文件
-（1）在指定位置创建config.ini文件，如：`/vol1/1000/docker/wakeup/config.ini`
-
-（2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
-
-##### 3. 运行镜像
-```bash
-docker run -d \
-  --name wakeup_pc \
-  -v /vol1/1000/docker/wakeup/config.ini:/config.ini \
-  --restart always \
-  --network host \
-  yexundao/wakeup_pc:latest
-```
-
-- 需要先根据自己的具体信息配置好config.ini文件
-- 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际配置文件地址
-
-
-<hr style='border-top-style: dotted !important;'>
-
 
 ### 二、使用iStoreOS
 
@@ -257,7 +259,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 ##### 优势
 
-- 配置较快，简单
+- 已有docker环境下配置快速，简单
 - 不受限于设备环境，几乎任何设备都是一样的操作
 
 ##### 劣势
@@ -273,7 +275,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ##### 优势
 
 - 软件利用率高，本身系统安装的软件包在其它程序也可以使用
-- 新增占用空间较小，安装快速
+- 新增占用空间较小，安装受网络环境影响小
 
 ##### 劣势
 
@@ -287,12 +289,13 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 #### （一）iStoreOS的启动项无法启动
 
-- 可能原因
+- 排查故障
   - 将启动项和计划任务的命令单独放在终端中，查看是否正常启动，是否有报错，再重启尝试。
 
 #### （二）iStoreOS可以唤醒电脑无法关闭电脑
-- 可能原因
+- 排查故障
   - 查看wakeup.py同级目录下是否有log.txt日志生成，查看日志内容排除故障
+- 可能原因
   - 如果日志显示：Host '主机IP' is not in the trusted hosts file. 则需要进入isos终端，在目标PC开机的状态下进行一次ssh连接，连接后自动添加为可信。
     - 如果还是不行，查看是否是类似于(ssh-ed25519 fingerprint SHA256:XbhC....)的提示，去网页，卸载掉ssh相关的软件包，重新安装openssh-client sshpass
 
