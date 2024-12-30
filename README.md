@@ -153,7 +153,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 ---
 #### （七）生效操作
-- 重启或来到系统-启动项-启动脚本，ctrl+f 搜索 cron，并点击重启，使计划任务生效
+- 重启或来到系统-启动项-启动脚本，`ctrl+f` 搜索 `cron`，并点击重启，使计划任务生效
 
 ---
 
@@ -192,7 +192,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 （3）记录好账户全名（本地账户没有“全名”，记录好“名称”即可）
 
 ##### 3. 新建注册表特殊账户
-（1）win+r输入regedit后回车进入注册表编辑器
+（1）`win+r`输入`regedit`后回车进入注册表编辑器
 
 （2）定位到`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`
 
@@ -305,7 +305,7 @@ on:
   git push --tags
   ```
   - 根据需要修改`v1.8.0`→`va.b.c`和之后的描述
-  - `v1.8.0`/`va.b.c`在工作流中将会提取`1.8.0`/`a.b.c`作为标签打在镜像上，镜像上将会用时有tags：`1.8.0`/`a.b.c`和`latest`
+  - `v1.8.0`/`va.b.c`在工作流中将会提取`1.8.0`/`a.b.c`作为标签打在镜像上，镜像上将会同时有两个tags：`1.8.0`/`a.b.c`和`latest`
 
 ##### 标签的获取
 ```dockerfile
