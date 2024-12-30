@@ -80,7 +80,12 @@ docker pull yexundao/wakeup_pc:latest
 
 ##### 3. 运行镜像
 ```bash
-docker run -d --restart=unless-stopped --name wakeup_pc --network host -v /vol1/1000/docker/wakeup/config.ini:/config.ini yexundao/wakeup_pc:latest
+docker run -d \
+  --name wakeup_pc \
+  -v /vol1/1000/docker/wakeup/config.ini:/config.ini \
+  --restart always \
+  --network host \
+  yexundao/wakeup_pc:latest
 ```
 
 - 需要先根据自己的具体信息配置好config.ini文件
