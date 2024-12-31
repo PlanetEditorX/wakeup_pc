@@ -33,7 +33,7 @@ char cmd2[256];
 char cmd3[256];
 
 // 套接字持续化连接
-int tcp_client_socket;
+int tcp_client_socket = -1;
 
 // 清空配置结构体
 void clear_config(Config *cfg)
@@ -168,75 +168,84 @@ void init_cmd(Config *config)
 // 和巴法云的TCP连接
 void connTCP()
 {
-    struct sockaddr_in server_addr;
     char substr[256]; // 确保这个缓冲区足够大
-
-    // 创建socket
+    // 1.创建socket套接字
     tcp_client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (tcp_client_socket == -1)
     {
-        perror("Socket creation failed");
+        perror("Socket creation failed!!!");
         exit(EXIT_FAILURE);
     }
-    char *ipaddr;
+    // 2.连接服务器
+    struct sockaddr_in targe;
+    targe.sin_family = AF_INET;
+    targe.sin_port = htons(8344);
     // IP 和端口
     char *hostname = "bemfa.com";
     struct hostent *hptr;
 
     if ((hptr = gethostbyname(hostname)) == NULL)
     {
-        printf("gethotbyname error\n");
+        printf("Gethotbyname error\n");
         exit(EXIT_FAILURE);
     }
-    char addressContent[32];
-    char *address;
-
-    address = inet_ntop(2, hptr, addressContent, sizeof(addressContent));
-    // if (inet_pton(2, address, &server_addr.sin_addr) <= 0)
-    // {
-    //     perror("inet_pton failed");
-    //     // 处理错误
-    // }
-    printf(address);
-
-    struct sockaddr_in serv_addr;
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(8344);                  // 端口号需要转换为网络字节序
-    serv_addr.sin_addr.s_addr = address;               // 将点分十进制 IP 地址转换为二进制形式
-
-    // server_addr.sin_addr = address;
-
-    // 连接服务器
-    if (connect(tcp_client_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    // 获取第一个 IP 地址
+    struct in_addr **addr_list = (struct in_addr **)hptr->h_addr_list;
+    struct in_addr *first_addr = addr_list[0];
+    if (first_addr == NULL)
     {
-        perror("connection failed");
+        fprintf(stderr, "No IP address found for host: %s\n", hostname);
+        return 1;
+    }
+    // 将第一个 IP 地址转换为字符串形式
+    char ip_str[INET_ADDRSTRLEN];
+    // inet_ntop 函数用于将一个二进制的网络地址（IPv4 或 IPv6）转换为一个以 null 结尾的字符串。这个函数支持 IPv4 和 IPv6
+    inet_ntop(AF_INET, &(first_addr->s_addr), ip_str, INET_ADDRSTRLEN);
+
+    printf("The IP address of %s is: %s\n", hostname, ip_str);
+    // inet_addr 函数用于将一个点分十进制的 IPv4 地址字符串转换为网络字节序的二进制值,如果转换成功，返回网络字节序的二进制值
+    targe.sin_addr.s_addr = inet_addr(ip_str);
+    if (connect(tcp_client_socket, (struct sockaddr *)&targe, sizeof(targe)) == -1)
+    {
+        printf("Connect server failed!!!\n");
+        close(tcp_client_socket);
         exit(EXIT_FAILURE);
     }
-    printf('connect......');
-
     // 发送订阅指令
     sprintf(substr, "cmd=1&uid=%s&topic=%s\r\n", config.client_id, config.topic);
     send(tcp_client_socket, substr, strlen(substr), 0);
 
     // 关闭socket
-    close(tcp_client_socket);
+    // close(tcp_client_socket);
 }
 
 // 心跳函数
 void *Ping(void *arg)
 {
+    // 发送心跳
     const char *keeplive = "ping\r\n";
-    struct timespec timer_wait = {.tv_sec = 30}; // 30秒
-
+    // send(tcp_client_socket, keeplive, strlen(keeplive), 0);
     while (1)
-    {
-        send(tcp_client_socket, keeplive, strlen(keeplive), 0);
+    { // 无限循环，每30秒发送一次心跳
+        if (send(tcp_client_socket, keeplive, strlen(keeplive), 0) == -1)
+        {
+            perror("send failed");
+            break; // 如果发送失败，则退出循环
+        }
+        printf("Heartbeat sent\n");
 
-        // 休眠30秒
-        nanosleep(&timer_wait, NULL);
+        // 等待30秒
+        sleep(30);
     }
-
+    // 开启定时，30秒发送一次心跳
+    // pthread_t timer_thread;
+    // int result = pthread_create(&timer_thread, NULL, Ping, NULL);
+    // if (result != 0)
+    // {
+    //     perror("pthread_create");
+    //     exit(EXIT_FAILURE);
+    // }
+    // pthread_detach(timer_thread); // 分离线程，自动回收资源
     return NULL;
 }
 
@@ -272,7 +281,6 @@ int check_url(const char *url, int port, int timeout)
     if (inet_pton(AF_INET, url, &addr.sin_addr) <= 0)
     {
         perror("Invalid address/ Address not supported");
-        close(sock);
         return 0; // 返回0表示失败
     }
 
@@ -304,31 +312,75 @@ int check_url(const char *url, int port, int timeout)
     return 0; // 返回0表示失败
 }
 
-void process_data(char *data)
+// 函数用于解析查询字符串并返回msg的值
+const char *getMsgValue(const char *query, char *state)
 {
-    char *sw;
-    // 解析数据
-    sw = strstr(data, "sw=") + 3;
-    if (sw && strcmp(sw, "on") == 0)
+    const char *key = "msg=";
+    const char *start, *end;
+
+    // 找到msg=的开始位置
+    start = strstr(query, key);
+    if (start == NULL)
     {
-        printf("正在打开电脑\n");
-        system(cmd1);
+        return NULL; // 没有找到msg=
     }
-    else
+
+    // 跳过key的长度，指向msg值的开始位置
+    start += strlen(key);
+
+    // 找到msg值的结束位置（即&符号的位置）
+    end = strchr(start, '&');
+    if (end == NULL)
     {
-        printf("正在关闭电脑\n");
-        printf("执行命令: %s\n", cmd2);
-        system(cmd2);
-        if (check_url("ssh_ip", 22, 10))
-        { // 假设ssh_ip是SSH服务器的IP
-            printf("执行命令: %s\n", cmd3);
-            system(cmd3);
-        }
-        else
+        // 没有找到&，说明msg是最后一个参数
+        end = start + strlen(start);
+    }
+
+    // 复制msg值到一个新的字符串中
+    state[end - start + 1];
+    strncpy(state, start, end - start);
+    state[end - start] = '\0'; // 确保字符串以'\0'结尾
+    while (*state)
+    { // 遍历字符串直到遇到'\0'
+        if (*state == '\r' || *state == '\n')
         {
-            printf("目标PC未在线或SSH服务器未开启\n");
+            *state = '\0'; // 替换'\r'或'\n'为'\0'
+        }
+        state++; // 移动到下一个字符
+    }
+}
+
+void process_data(char *recvData)
+{
+    // 解析数据
+    char state[3] = { '\0' };
+    char _on[] = "on";
+    char _off[] = "off";
+    getMsgValue(recvData, &state);
+    if (state[0] != '\0')
+    {
+        if (strcmp(state, _on) == 0)
+        {
+            printf("正在打开电脑\n");
+            system(cmd1);
+        }
+        else if (strcmp(state, _off) == 0)
+        {
+            printf("正在关闭电脑\n");
+            printf("执行命令: %s\n", cmd2);
+            system(cmd2);
+            if (check_url("ssh_ip", 22, 10))
+            { // 假设ssh_ip是SSH服务器的IP
+                printf("执行命令: %s\n", cmd3);
+                system(cmd3);
+            }
+            else
+            {
+                printf("目标PC未在线或SSH服务器未开启\n");
+            }
         }
     }
+
 }
 
 int main()
@@ -336,7 +388,7 @@ int main()
     pthread_t ping_thread;
     parse_config("config.ini", &config);
     init_cmd(&config);
-
+    // 和巴法云进行TCP连接
     connTCP();
 
     // 创建心跳线程

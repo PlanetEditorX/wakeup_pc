@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/root/wakeup_pc/c/tcp_connect",
-      "program": "/root/wakeup_pc/c/tcp_connect/tcp_server",
+      "cwd": "/root/wakeup_pc/c",
+      "program": "/root/wakeup_pc/c/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
