@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "c:/Users/DearX/Documents/Github/wakeup_pc/c",
-      "program": "c:/Users/DearX/Documents/Github/wakeup_pc/c/${fileBasenameNoExtension}.exe",
+      "cwd": "/root/wakeup_pc/c/tcp_connect",
+      "program": "/root/wakeup_pc/c/tcp_connect/tcp_server",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
