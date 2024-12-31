@@ -148,12 +148,74 @@ void parse_config(const char *filename, Config *cfg)
     fclose(file);
 }
 
+// 网络唤醒
+int wol(const char *mac)
+{
+    if (mac == NULL || strlen(mac) != 17)
+    { // MAC地址格式校验
+        printf("wol failed, because mac is null or incorrect format\n");
+        return -1;
+    }
+
+    int ret = -1;
+    int send_length = -1;
+    unsigned char packet[102] = {0};
+    struct sockaddr_in addr;
+    int sockfd, i, j, option_value = 1;
+    unsigned char mactohex[6] = {0};
+
+    // 将MAC地址字符串转换为十六进制值
+    sscanf(mac, "%02x:%02x:%02x:%02x:%02x:%02x",
+           &mactohex[0], &mactohex[1], &mactohex[2],
+           &mactohex[3], &mactohex[4], &mactohex[5]);
+
+    // 构建魔术包
+    for (i = 0; i < 6; i++)
+    { // 6对“FF”前缀
+        packet[i] = 0xFF;
+    }
+    for (i = 6; i < 102; i += 6)
+    { // MAC地址重复16次
+        memcpy(packet + i, mactohex, 6);
+    }
+
+    // 创建UDP套接字
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    ret = setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &option_value, sizeof(option_value));
+    if (ret < 0)
+    {
+        printf("set socket opt failed\n");
+        close(sockfd);
+        return ret;
+    }
+
+    // 设置目标地址为广播地址
+    memset((void *)&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(9);                            // 使用UDP端口9
+    addr.sin_addr.s_addr = inet_addr("255.255.255.255"); // UDP广播地址
+
+    // 设置权限,允许套接字发送广播数据包
+    int broadcastPermission = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastPermission, sizeof(broadcastPermission)) < 0)
+    {
+        perror("setsockopt(SO_BROADCAST) failed");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    // 发送广播
+    send_length = sendto(sockfd, packet, sizeof(packet), 0, (struct sockaddr *)&addr, sizeof(addr));
+    if (send_length < 0)
+    {
+        perror("sendto failed");
+    }
+    close(sockfd);
+    return ret;
+}
 
 // 初始化命令
 void init_cmd(Config *config)
 {
-    // 网络唤醒
-    snprintf(cmd1, sizeof(cmd1), "wakeonlan %s", config->mac);
     // 发送关闭电脑off给巴法云，更新状态
     snprintf(cmd2, sizeof(cmd2), "/usr/bin/curl -s \"https://api.bemfa.com/api/device/v1/data/3/push/get/?uid=%s&topic=%s&msg=off\"", config->client_id, config->topic);
     // #局域网连接openssh服务器，进行关机操作
@@ -362,7 +424,8 @@ void process_data(char *recvData)
         if (strcmp(state, _on) == 0)
         {
             printf("正在打开电脑\n");
-            system(cmd1);
+            // 网络唤醒
+            wol(&config.mac);
         }
         else if (strcmp(state, _off) == 0)
         {
