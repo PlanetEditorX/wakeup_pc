@@ -294,7 +294,7 @@ void *Ping()
 }
 
 // 检查URL是否可达
-int check_url(const char *url, int port, int timeout)
+char check_url(const char *url, int port, int timeout)
 {
     int sock;
     struct sockaddr_in addr;
@@ -380,8 +380,7 @@ const char *getMsgValue(const char *query, char *state)
     }
 
     // 复制msg值到一个新的字符串中
-    state[end - start + 1];
-    strncpy(state, start, end - start);
+    strncpy(state, start, (size_t)(end - start));
     state[end - start] = '\0'; // 确保字符串以'\0'结尾
     while (*state)
     { // 遍历字符串直到遇到'\0'
