@@ -51,7 +51,7 @@ void clear_mark(char *data)
     {
         memmove(data, data + 1, strlen(data) - 1);
     }
-    int len = strlen(data);
+    size_t len = strlen(data);
     while (data[len - 1] == '\"')
     {
         data[len - 1] = '\0';
@@ -156,14 +156,14 @@ int wol(const char *mac)
     }
 
     int ret = -1;
-    int send_length = -1;
+    ssize_t send_length = -1;
     unsigned char packet[102] = {0};
     struct sockaddr_in addr;
-    int sockfd, i, j, option_value = 1;
+    int sockfd, i, option_value = 1;
     unsigned char mactohex[6] = {0};
 
     // 将MAC地址字符串转换为十六进制值
-    sscanf(mac, "%02x:%02x:%02x:%02x:%02x:%02x",
+    sscanf(mac, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
            &mactohex[0], &mactohex[1], &mactohex[2],
            &mactohex[3], &mactohex[4], &mactohex[5]);
 
@@ -212,10 +212,10 @@ int wol(const char *mac)
 }
 
 // 初始化命令
-void init_cmd(Config *config)
+void init_cmd()
 {
     // #局域网连接openssh服务器，进行关机操作
-    snprintf(cmd_ssh2shutdown, sizeof(cmd_ssh2shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /s /t 10'", config->password, config->user, config->ip);
+    snprintf(cmd_ssh2shutdown, sizeof(cmd_ssh2shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /s /t 10'", config.password, config.user, config.ip);
     // 打印命令
     printf("cmd_ssh2shutdown: %s\n", cmd_ssh2shutdown);
 }
@@ -251,7 +251,7 @@ void connTCP()
     if (first_addr == NULL)
     {
         fprintf(stderr, "No IP address found for host: %s\n", hostname);
-        return 1;
+        exit(EXIT_FAILURE);
     }
     // 将第一个 IP 地址转换为字符串形式
     char ip_str[INET_ADDRSTRLEN];
@@ -273,7 +273,7 @@ void connTCP()
 }
 
 // 心跳函数
-void *Ping(void *arg)
+void *Ping()
 {
     // 发送心跳
     const char *keeplive = "ping\r\n";
@@ -320,7 +320,7 @@ int check_url(const char *url, int port, int timeout)
     // 设置服务器地址
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
+    addr.sin_port = htons((uint16_t)port);
     if (inet_pton(AF_INET, url, &addr.sin_addr) <= 0)
     {
         printf("Invalid address/ Address not supported\n");
@@ -416,7 +416,7 @@ void process_data(char *recvData)
         char state[4] = {'\0'};
         char _on[] = "on";
         char _off[] = "off";
-        getMsgValue(data, &state);
+        getMsgValue(data, state);
         if (state[0] != '\0')
         {
             char pc_status = check_url(config.ip, 22, 3);
@@ -427,7 +427,7 @@ void process_data(char *recvData)
                     printf("当前目标PC在线,无须执行开机指令.\n");
                 } else {
                     // 网络唤醒
-                    if (wol(&config.mac) >= 0)
+                    if (wol(config.mac) >= 0)
                     {
                         printf("电脑开机指令发送成功!\n");
                     }
@@ -461,7 +461,7 @@ int main()
 {
     pthread_t ping_thread;
     parse_config("config.ini", &config);
-    init_cmd(&config);
+    init_cmd();
     // 和巴法云进行TCP连接
     connTCP();
 
