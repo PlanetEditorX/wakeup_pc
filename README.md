@@ -1,7 +1,7 @@
 # 利用小爱同学控制局域网电脑开关机（docker/iStoreOS）
 
 ---
-
+转移至`p2c`分支：https://github.com/PlanetEditorX/wakeup_pc/tree/p2c
 ### 一、使用docker
 
 ---
