@@ -14,7 +14,22 @@
 docker pull yexundao/wakeup_pc:latest
 ```
 - 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本。
-- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](C:\Users\DearX\Documents\Github\wakeup_pc\attachment\image-20250101171824717.png)
+
+- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](.\attachment\image-20250101171824717.png)
+
+- 如果是arm64设备，如Armbian系统，拉取arm64版本镜像
+
+  - ```bash
+    
+    docker run -d \
+      --name wakeup_pc \
+      -v /root/soft/wakeup/config.ini:/app/config.ini \
+      --restart always \
+      --network host \
+      yexundao/wakeup_pc:2.0.0-arm64
+    
+    ```
+
 
 ##### 2. 创建配置文件
 （1）在指定位置创建config.ini文件，如：`/vol1/1000/docker/wakeup/config.ini`
@@ -144,7 +159,7 @@ docker build -t wakeup_pc .
 ```bash
 docker images
 ```
-![image-20250101174959871](C:\Users\DearX\Documents\Github\wakeup_pc\attachment\image-20250101174959871.png)
+![image-20250101174959871](.\attachment\image-20250101174959871.png)
 
 - 如果多次构建，会产生很多标签为`none`的镜像，使用命令`docker rmi $(docker images -f "dangling=true" -q)`删除无用镜像。
 
