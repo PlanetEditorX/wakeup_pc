@@ -270,9 +270,6 @@ void connTCP()
     // 发送订阅指令
     sprintf(substr, "cmd=1&uid=%s&topic=%s\r\n", config.client_id, config.topic);
     send(tcp_client_socket, substr, strlen(substr), 0);
-
-    // 关闭socket
-    // close(tcp_client_socket);
 }
 
 // 心跳函数
@@ -280,12 +277,11 @@ void *Ping(void *arg)
 {
     // 发送心跳
     const char *keeplive = "ping\r\n";
-    // send(tcp_client_socket, keeplive, strlen(keeplive), 0);
     while (1)
     { // 无限循环，每30秒发送一次心跳
         if (send(tcp_client_socket, keeplive, strlen(keeplive), 0) == -1)
         {
-            perror("send failed");
+            perror("Send failed");
             break; // 如果发送失败，则退出循环
         }
         printf("Heartbeat sent\n");
@@ -374,7 +370,6 @@ const char *getMsgValue(const char *query, char *state)
 
     // 跳过key的长度，指向msg值的开始位置
     start += strlen(key);
-
     // 找到msg值的结束位置（即&符号的位置）
     end = strchr(start, '&');
     if (end == NULL)
@@ -418,28 +413,35 @@ void process_data(char *recvData)
     {
         printf("Received topic publishing data.\n");
         // 解析数据
-        char state[3] = {'\0'};
+        char state[4] = {'\0'};
         char _on[] = "on";
         char _off[] = "off";
         getMsgValue(data, &state);
         if (state[0] != '\0')
         {
+            char pc_status = check_url(config.ip, 22, 3);
             if (strcmp(state, _on) == 0)
             {
                 printf("正在打开电脑...\n");
-                // 网络唤醒
-                if (wol(&config.mac) >= 0)
-                {
-                    printf("电脑开机指令发送成功!\n");
+                if (pc_status) {
+                    printf("当前目标PC在线,无须执行开机指令.\n");
                 } else {
-                    printf("电脑开机指令发送失败!\n");
+                    // 网络唤醒
+                    if (wol(&config.mac) >= 0)
+                    {
+                        printf("电脑开机指令发送成功!\n");
+                    }
+                    else
+                    {
+                        printf("电脑开机指令发送失败!\n");
+                    }
                 }
             }
             else if (strcmp(state, _off) == 0)
             {
                 printf("正在关闭电脑\n");
-                if (check_url(config.ip, 22, 10))
-                { // 假设ssh_ip是SSH服务器的IP
+                if (pc_status)
+                {
                     printf("执行命令: %s\n", cmd_ssh2shutdown);
                     system(cmd_ssh2shutdown);
                 }
