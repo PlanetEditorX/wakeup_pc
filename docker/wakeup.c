@@ -221,7 +221,6 @@ void init_cmd()
     printf("cmd_shutdown: %s\n", cmd_shutdown);
 }
 
-
 // 和巴法云的TCP连接
 void connTCP()
 {
@@ -388,7 +387,8 @@ void getMsgValue(const char *query, char *state)
             state++; // 移动到下一个字符
         }
     }
-    else {
+    else
+    {
         // 没有找到msg=
         printf("No msg found");
     }
@@ -419,48 +419,59 @@ void process_data(char *recvData)
         char _on[] = "on";
         char _off[] = "off";
         getMsgValue(data, state);
-        if (state[0] != '\0')
+        char pc_status = check_url(config.ip, 22, 3);
+        if (strncmp(state, "on", 2) == 0)
         {
-            char pc_status = check_url(config.ip, 22, 3);
-            if (strcmp(state, _on) == 0)
+            printf("正在打开电脑...\n");
+            if (pc_status)
             {
-                printf("正在打开电脑...\n");
-                if (pc_status) {
-                    printf("当前目标PC在线,无须执行开机指令.\n");
-                } else {
-                    // 网络唤醒
-                    if (wol(config.mac) >= 0)
-                    {
-                        printf("电脑开机指令发送成功!\n");
-                    }
-                    else
-                    {
-                        printf("电脑开机指令发送失败!\n");
-                    }
-                }
+                printf("当前目标PC在线,无须执行开机指令.\n");
             }
-            else if (strcmp(state, _off) == 0)
+            else
             {
-                printf("正在关闭电脑\n");
-                if (pc_status)
+                // 网络唤醒
+                if (wol(config.mac) >= 0)
                 {
-                    printf("执行命令: %s\n", cmd_shutdown);
-                    system(cmd_shutdown);
+                    printf("电脑开机指令发送成功!\n");
                 }
                 else
                 {
-                    printf("目标PC未在线或SSH服务器未开启\n");
+                    printf("电脑开机指令发送失败!\n");
                 }
             }
         }
+        else if (strncmp(state, "off", 3) == 0)
+        {
+            // 检查是否以 "off" 开头
+            printf("正在关闭电脑\n");
+            if (pc_status)
+            {
+                printf("执行命令: %s\n", cmd_shutdown);
+                system(cmd_shutdown);
+            }
+            else
+            {
+                printf("目标PC未在线或SSH服务器未开启\n");
+            }
+        }
+        else
+        {
+            printf("The state does not start with 'on' or 'off'.\n");
+        }
     }
-    else {
+    else
+    {
         printf("Unexpected return!!!\n");
     }
 }
 
 int main()
 {
+    if (freopen("log.txt", "w", stdout) == NULL)
+    {
+        perror("Failed to open log.txt");
+        return 1;
+    }
     pthread_t ping_thread;
     parse_config("config.ini", &config);
     init_cmd();
