@@ -28,9 +28,7 @@ typedef struct
 Config config;
 
 // 执行命令
-char cmd1[256];
-char cmd2[256];
-char cmd3[256];
+char cmd_ssh2shutdown[256];
 
 // 套接字持续化连接
 int tcp_client_socket = -1;
@@ -153,7 +151,7 @@ int wol(const char *mac)
 {
     if (mac == NULL || strlen(mac) != 17)
     { // MAC地址格式校验
-        printf("wol failed, because mac is null or incorrect format\n");
+        printf("Wol failed, because mac is null or incorrect format\n");
         return -1;
     }
 
@@ -184,7 +182,7 @@ int wol(const char *mac)
     ret = setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &option_value, sizeof(option_value));
     if (ret < 0)
     {
-        printf("set socket opt failed\n");
+        printf("Set socket opt failed\n");
         close(sockfd);
         return ret;
     }
@@ -216,14 +214,10 @@ int wol(const char *mac)
 // 初始化命令
 void init_cmd(Config *config)
 {
-    // 发送关闭电脑off给巴法云，更新状态
-    snprintf(cmd2, sizeof(cmd2), "/usr/bin/curl -s \"https://api.bemfa.com/api/device/v1/data/3/push/get/?uid=%s&topic=%s&msg=off\"", config->client_id, config->topic);
     // #局域网连接openssh服务器，进行关机操作
-    snprintf(cmd3, sizeof(cmd3), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s shutdown - s - t 10", config->password, config->user, config->ip);
+    snprintf(cmd_ssh2shutdown, sizeof(cmd_ssh2shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /s /t 10'", config->password, config->user, config->ip);
     // 打印命令
-    printf("cmd1: %s\n", cmd1);
-    printf("cmd2: %s\n", cmd2);
-    printf("cmd3: %s\n", cmd3);
+    printf("cmd_ssh2shutdown: %s\n", cmd_ssh2shutdown);
 }
 
 
@@ -299,15 +293,6 @@ void *Ping(void *arg)
         // 等待30秒
         sleep(30);
     }
-    // 开启定时，30秒发送一次心跳
-    // pthread_t timer_thread;
-    // int result = pthread_create(&timer_thread, NULL, Ping, NULL);
-    // if (result != 0)
-    // {
-    //     perror("pthread_create");
-    //     exit(EXIT_FAILURE);
-    // }
-    // pthread_detach(timer_thread); // 分离线程，自动回收资源
     return NULL;
 }
 
@@ -332,7 +317,7 @@ int check_url(const char *url, int port, int timeout)
 
     if (sock < 0)
     {
-        perror("Socket creation failed");
+        perror("Socket creation failed\n");
         return 0; // 返回0表示失败
     }
 
@@ -342,7 +327,7 @@ int check_url(const char *url, int port, int timeout)
     addr.sin_port = htons(port);
     if (inet_pton(AF_INET, url, &addr.sin_addr) <= 0)
     {
-        perror("Invalid address/ Address not supported");
+        printf("Invalid address/ Address not supported\n");
         return 0; // 返回0表示失败
     }
 
@@ -412,38 +397,62 @@ const char *getMsgValue(const char *query, char *state)
     }
 }
 
+// 处理数据
 void process_data(char *recvData)
 {
-    // 解析数据
-    char state[3] = { '\0' };
-    char _on[] = "on";
-    char _off[] = "off";
-    getMsgValue(recvData, &state);
-    if (state[0] != '\0')
+    size_t size = strlen(recvData);
+    char data[size];
+    memcpy(data, recvData, size);
+    // 订阅主题正常返回
+    if (strstr(data, "cmd=1&res=1"))
     {
-        if (strcmp(state, _on) == 0)
+        printf("Subscription topic successful.\n");
+    }
+    // 心跳正常返回
+    else if (strstr(data, "cmd=0&res=1"))
+    {
+        printf("Heartbeat sent successful.\n");
+    }
+    // 接受到主题发布的数据
+    else if (strstr(data, "cmd=2&uid="))
+    {
+        printf("Received topic publishing data.\n");
+        // 解析数据
+        char state[3] = {'\0'};
+        char _on[] = "on";
+        char _off[] = "off";
+        getMsgValue(data, &state);
+        if (state[0] != '\0')
         {
-            printf("正在打开电脑\n");
-            // 网络唤醒
-            wol(&config.mac);
-        }
-        else if (strcmp(state, _off) == 0)
-        {
-            printf("正在关闭电脑\n");
-            printf("执行命令: %s\n", cmd2);
-            system(cmd2);
-            if (check_url("ssh_ip", 22, 10))
-            { // 假设ssh_ip是SSH服务器的IP
-                printf("执行命令: %s\n", cmd3);
-                system(cmd3);
-            }
-            else
+            if (strcmp(state, _on) == 0)
             {
-                printf("目标PC未在线或SSH服务器未开启\n");
+                printf("正在打开电脑...\n");
+                // 网络唤醒
+                if (wol(&config.mac) >= 0)
+                {
+                    printf("电脑开机指令发送成功!\n");
+                } else {
+                    printf("电脑开机指令发送失败!\n");
+                }
+            }
+            else if (strcmp(state, _off) == 0)
+            {
+                printf("正在关闭电脑\n");
+                if (check_url(config.ip, 22, 10))
+                { // 假设ssh_ip是SSH服务器的IP
+                    printf("执行命令: %s\n", cmd_ssh2shutdown);
+                    system(cmd_ssh2shutdown);
+                }
+                else
+                {
+                    printf("目标PC未在线或SSH服务器未开启\n");
+                }
             }
         }
     }
-
+    else {
+        printf("Unexpected return!!!\n");
+    }
 }
 
 int main()
@@ -464,17 +473,19 @@ int main()
     // 让心跳线程运行在后台
     pthread_detach(ping_thread);
 
-    char recvData[1024];
     int len;
+    char recvData[100];
 
     // 循环接收数据
     while (1)
     {
+        // 初始化
+        memset(recvData, 0, sizeof(recvData));
         len = recv(tcp_client_socket, recvData, sizeof(recvData) - 1, 0);
         if (len > 0)
         {
             recvData[len] = '\0'; // 确保字符串以空字符结尾
-            printf("recv: %s\n", recvData);
+            printf("recv: %s", recvData);
             process_data(recvData);
         }
         else if (len == 0)
