@@ -29,7 +29,7 @@ typedef struct
 Config config;
 
 // 执行命令
-char cmd_ssh2shutdown[800];
+char cmd_shutdown[800];
 
 // 套接字持续化连接
 int tcp_client_socket = -1;
@@ -216,9 +216,9 @@ int wol(const char *mac)
 void init_cmd()
 {
     // #局域网连接openssh服务器，进行关机操作
-    snprintf(cmd_ssh2shutdown, sizeof(cmd_ssh2shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /s /t 10'", config.password, config.user, config.ip);
+    snprintf(cmd_shutdown, sizeof(cmd_shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /s /t 10'", config.password, config.user, config.ip);
     // 打印命令
-    printf("cmd_ssh2shutdown: %s\n", cmd_ssh2shutdown);
+    printf("cmd_shutdown: %s\n", cmd_shutdown);
 }
 
 
@@ -444,8 +444,8 @@ void process_data(char *recvData)
                 printf("正在关闭电脑\n");
                 if (pc_status)
                 {
-                    printf("执行命令: %s\n", cmd_ssh2shutdown);
-                    system(cmd_ssh2shutdown);
+                    printf("执行命令: %s\n", cmd_shutdown);
+                    system(cmd_shutdown);
                 }
                 else
                 {
