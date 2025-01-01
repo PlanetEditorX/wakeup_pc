@@ -15,7 +15,7 @@ docker pull yexundao/wakeup_pc:latest
 ```
 - 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本。
 
-- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](.\attachment\image-20250101171824717.png)
+- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
 
 - 如果是arm64设备，如Armbian系统，拉取arm64版本镜像
 
@@ -82,7 +82,7 @@ docker pull yexundao/wakeup_pc:latest
     ```
 
   - <div style="text-align: left;">
-        <img src="C:\Users\DearX\Documents\Github\wakeup_pc\attachment\image-20250101172542475.png" alt="description">
+        <img src="attachment/image-20250101172542475.png" alt="description">
     </div>
 
 - 如果是带日志的命令启动，可直接在docker的宿主机查看日志
@@ -92,7 +92,7 @@ docker pull yexundao/wakeup_pc:latest
     ```
 
   - <div style="text-align: left;">
-        <img src="C:\Users\DearX\Documents\Github\wakeup_pc\attachment\image-20250101173848545.png" alt="description">
+        <img src="attachment/image-20250101173848545.png" alt="description">
     </div>
 
   - 如果是空日志文件，则第一行输出关机命令的参数，如`cmd_shutdown: sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@IP 'shutdown /s /t 10'`，可通过对比相关数据和config.ini的参数是否匹配，如果为空则说明参数读取异常，检查config.ini配置文件的内容和位置是否正确。
@@ -159,7 +159,7 @@ docker build -t wakeup_pc .
 ```bash
 docker images
 ```
-![image-20250101174959871](.\attachment\image-20250101174959871.png)
+![image-20250101174959871](attachment/image-20250101174959871.png)
 
 - 如果多次构建，会产生很多标签为`none`的镜像，使用命令`docker rmi $(docker images -f "dangling=true" -q)`删除无用镜像。
 
