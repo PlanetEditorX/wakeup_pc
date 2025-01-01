@@ -13,14 +13,15 @@
 #define MAX_SECTION_LENGTH 256
 #define MAX_KEY_LENGTH 256
 #define MAX_VALUE_LENGTH 256
+#define MEDIUM_VALUE_LENGTH 50
 
 // 用于存储配置信息的结构体
 typedef struct
 {
-    char client_id[30];
+    char client_id[MEDIUM_VALUE_LENGTH];
     char topic[MAX_VALUE_LENGTH];
-    char mac[20];
-    char ip[50];
+    char mac[MEDIUM_VALUE_LENGTH];
+    char ip[MEDIUM_VALUE_LENGTH];
     char user[MAX_VALUE_LENGTH];
     char password[MAX_VALUE_LENGTH];
 } Config;
