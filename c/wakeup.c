@@ -17,10 +17,10 @@
 // 用于存储配置信息的结构体
 typedef struct
 {
-    char client_id[MAX_VALUE_LENGTH];
+    char client_id[30];
     char topic[MAX_VALUE_LENGTH];
-    char mac[MAX_VALUE_LENGTH];
-    char ip[MAX_VALUE_LENGTH];
+    char mac[20];
+    char ip[50];
     char user[MAX_VALUE_LENGTH];
     char password[MAX_VALUE_LENGTH];
 } Config;
@@ -268,7 +268,7 @@ void connTCP()
         exit(EXIT_FAILURE);
     }
     // 发送订阅指令
-    sprintf(substr, "cmd=1&uid=%s&topic=%s\r\n", config.client_id, config.topic);
+    snprintf(substr, sizeof(substr), "cmd=1&uid=%s&topic=%s\r\n", config.client_id, config.topic);
     send(tcp_client_socket, substr, strlen(substr), 0);
 }
 
