@@ -9,11 +9,11 @@
 # 等待 cron 启动完成
 sleep 1
 
-# 使Python脚本可执行
-chmod +x /wakeup.py
+# 使wakeup可执行
+chmod +x /wakeup
 
-# 运行 Python 脚本
-python3 /wakeup.py
+# 运行
+./wakeup
 
 # 清理缓存
 rm -rf /var/cache/apk/* && apk cache clean

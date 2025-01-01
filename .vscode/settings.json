@@ -64,6 +64,7 @@
     "string": "c",
     "string_view": "c",
     "span": "c",
-    "initializer_list": "c"
+    "initializer_list": "c",
+    "stdio.h": "c"
   }
 }
