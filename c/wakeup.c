@@ -357,38 +357,40 @@ char check_url(const char *url, int port, int timeout)
 }
 
 // 函数用于解析查询字符串并返回msg的值
-const char *getMsgValue(const char *query, char *state)
+void getMsgValue(const char *query, char *state)
 {
     const char *key = "msg=";
     const char *start, *end;
 
     // 找到msg=的开始位置
     start = strstr(query, key);
-    if (start == NULL)
+    if (start)
     {
-        return NULL; // 没有找到msg=
-    }
-
-    // 跳过key的长度，指向msg值的开始位置
-    start += strlen(key);
-    // 找到msg值的结束位置（即&符号的位置）
-    end = strchr(start, '&');
-    if (end == NULL)
-    {
-        // 没有找到&，说明msg是最后一个参数
-        end = start + strlen(start);
-    }
-
-    // 复制msg值到一个新的字符串中
-    strncpy(state, start, (size_t)(end - start));
-    state[end - start] = '\0'; // 确保字符串以'\0'结尾
-    while (*state)
-    { // 遍历字符串直到遇到'\0'
-        if (*state == '\r' || *state == '\n')
+        // 跳过key的长度，指向msg值的开始位置
+        start += strlen(key);
+        // 找到msg值的结束位置（即&符号的位置）
+        end = strchr(start, '&');
+        if (end == NULL)
         {
-            *state = '\0'; // 替换'\r'或'\n'为'\0'
+            // 没有找到&，说明msg是最后一个参数
+            end = start + strlen(start);
         }
-        state++; // 移动到下一个字符
+
+        // 复制msg值到一个新的字符串中
+        strncpy(state, start, (size_t)(end - start));
+        state[end - start] = '\0'; // 确保字符串以'\0'结尾
+        while (*state)
+        { // 遍历字符串直到遇到'\0'
+            if (*state == '\r' || *state == '\n')
+            {
+                *state = '\0'; // 替换'\r'或'\n'为'\0'
+            }
+            state++; // 移动到下一个字符
+        }
+    }
+    else {
+        // 没有找到msg=
+        printf("No msg found");
     }
 }
 
@@ -475,7 +477,7 @@ int main()
     // 让心跳线程运行在后台
     pthread_detach(ping_thread);
 
-    int len;
+    ssize_t len;
     char recvData[100];
 
     // 循环接收数据
