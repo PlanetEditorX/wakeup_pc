@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # 清理缓存
-rm -rf /var/cache/apk/* && apk cache clean
+rm -rf /var/cache/apk/*
 
 # 创建日志文件
 touch log.txt
