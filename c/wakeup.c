@@ -29,7 +29,7 @@ typedef struct
 Config config;
 
 // 执行命令
-char cmd_ssh2shutdown[256];
+char cmd_ssh2shutdown[800];
 
 // 套接字持续化连接
 int tcp_client_socket = -1;
@@ -67,8 +67,8 @@ void parse_config(const char *filename, Config *cfg)
     FILE *file;
     char line[MAX_LINE_LENGTH];
     char section[MAX_SECTION_LENGTH];
-    char key[MAX_KEY_LENGTH];
-    char value[MAX_VALUE_LENGTH];
+    char key[MEDIUM_VALUE_LENGTH];
+    char value[MEDIUM_VALUE_LENGTH];
     int reading_section = 0;
 
     clear_config(cfg);
@@ -108,7 +108,7 @@ void parse_config(const char *filename, Config *cfg)
         {
             if (strcmp(key, "client_id") == 0)
             {
-                strncpy(cfg->client_id, value, MAX_VALUE_LENGTH - 1);
+                strncpy(cfg->client_id, value, MEDIUM_VALUE_LENGTH - 1);
                 clear_mark(cfg->client_id);
             }
             else if (strcmp(key, "topic") == 0)
@@ -121,7 +121,7 @@ void parse_config(const char *filename, Config *cfg)
         {
             if (strcmp(key, "mac") == 0)
             {
-                strncpy(cfg->mac, value, MAX_VALUE_LENGTH - 1);
+                strncpy(cfg->mac, value, MEDIUM_VALUE_LENGTH - 1);
                 clear_mark(cfg->mac);
             }
         }
@@ -129,7 +129,7 @@ void parse_config(const char *filename, Config *cfg)
         {
             if (strcmp(key, "ip") == 0)
             {
-                strncpy(cfg->ip, value, MAX_VALUE_LENGTH - 1);
+                strncpy(cfg->ip, value, MEDIUM_VALUE_LENGTH - 1);
                 clear_mark(cfg->ip);
             }
             else if (strcmp(key, "user") == 0)
@@ -225,7 +225,7 @@ void init_cmd()
 // 和巴法云的TCP连接
 void connTCP()
 {
-    char substr[256]; // 确保这个缓冲区足够大
+    char substr[400]; // 确保这个缓冲区足够大
     // 1.创建socket套接字
     tcp_client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (tcp_client_socket == -1)
