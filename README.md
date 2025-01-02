@@ -17,38 +17,30 @@ docker pull yexundao/wakeup_pc:latest
 
 - 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
 
-- 如果是arm64设备，如Armbian系统，拉取arm64版本镜像
-
-  - ```bash
-
-    docker run -d \
-      --name wakeup_pc \
-      -v /root/soft/wakeup/config.ini:/app/config.ini \
-      --restart always \
-      --network host \
-      yexundao/wakeup_pc:2.0.0-arm64
-
-    ```
+- 如果是arm64设备，如Armbian系统，拉取arm版本镜像
+```bash
+  docker pull yexundao/wakeup_pc:latest-arm
+```
 
 
 ##### 2. 创建配置文件
 （1）在指定位置创建config.ini文件，如：`/vol1/1000/docker/wakeup/config.ini`
 
-（2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
+（2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
 
 ##### 3. 运行镜像
 
-- 带日志命令启动
+- 带日志和配置命令启动
 
   - 在宿主机上配置文件目录下提前建立日志文件
-
-    - ```bash
-      touch /vol1/1000/docker/wakeup/log.txt
-      ```
+    ```bash
+    touch /vol1/1000/docker/wakeup/log.txt
+    ```
 
   - 创建并启动容器
 
-    - ```bash
+    - x86版本
+      ```bash
       docker run -d \
         --name wakeup_pc \
         -v /vol1/1000/docker/wakeup/config.ini:/app/config.ini \
@@ -57,17 +49,28 @@ docker pull yexundao/wakeup_pc:latest
         --network host \
         yexundao/wakeup_pc:latest
       ```
+    
+    - arm64版本
+      ```bash
+      docker run -d \
+        --name wakeup_pc \
+        -v /root/soft/wakeup/config.ini:/app/config.ini \
+        --restart always \
+        --network host \
+        yexundao/wakeup_pc:latest-arm
+      ```
+    
+      
 
 - 仅配置命令
-
-  - ```bash
-    docker run -d \
-      --name wakeup_pc \
-      -v /vol1/1000/docker/wakeup/config.ini:/app/config.ini \
-      --restart always \
-      --network host \
-      yexundao/wakeup_pc:latest
-    ```
+  ```bash
+  docker run -d \
+    --name wakeup_pc \
+    -v /vol1/1000/docker/wakeup/config.ini:/app/config.ini \
+    --restart always \
+    --network host \
+    yexundao/wakeup_pc:latest
+  ```
 
 - 需要先根据自己的具体信息配置好config.ini文件
 
@@ -76,38 +79,33 @@ docker pull yexundao/wakeup_pc:latest
 - 注意，这里容器里的目录位置是/app/
 
 - 如果需要查看输出日志，可进入容器排查
+  ```bash
+  docker exec -it wakeup_pc sh
+  ```
 
-  - ```bash
-    docker exec -it wakeup_pc sh
-    ```
-
-  - <div style="text-align: left;">
-        <img src="attachment/image-20250101172542475.png" alt="description">
-    </div>
+  <div style="text-align: left;">
+      <img src="attachment/image-20250101172542475.png" alt="description">
+  </div>
 
 - 如果是带日志的命令启动，可直接在docker的宿主机查看日志
+  ```bash
+  tail -f /vol1/1000/docker/wakeup/log.txt
+  ```
 
-  - ```bash
-    tail -f /vol1/1000/docker/wakeup/log.txt
-    ```
+  <div style="text-align: left;">
+      <img src="attachment/image-20250101173848545.png" alt="description">
+  </div>
 
-  - <div style="text-align: left;">
-        <img src="attachment/image-20250101173848545.png" alt="description">
-    </div>
+- 如果是空日志文件，则第一行输出关机命令的参数，如`cmd_shutdown: sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@IP 'shutdown /s /t 10'`，可通过对比相关数据和config.ini的参数是否匹配，如果为空则说明参数读取异常，检查config.ini配置文件的内容和位置是否正确。
 
-  - 如果是空日志文件，则第一行输出关机命令的参数，如`cmd_shutdown: sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@IP 'shutdown /s /t 10'`，可通过对比相关数据和config.ini的参数是否匹配，如果为空则说明参数读取异常，检查config.ini配置文件的内容和位置是否正确。
+- 和巴法云建立TCP连接
+  ```shell
+  The IP address of bemfa.com is: 119.91.109.180
+  Heartbeat sent
+  recv: cmd=1&res=1
+  ```
 
-  - 和巴法云建立TCP连接
-
-    - ```bash
-      The IP address of bemfa.com is: 119.91.109.180
-      Heartbeat sent
-      recv: cmd=1&res=1
-      ```
-
-    - 会向巴法云的IP发送TCP请求，看返回的是否是`recv: cmd=1&res=1`，全是1才是订阅主题成功，其它情况检查是否参数异常。
-
-
+  会向巴法云的IP发送TCP请求，看返回的是否是`recv: cmd=1&res=1`，全是1才是订阅主题成功，其它情况检查是否参数异常。
 
 
 
