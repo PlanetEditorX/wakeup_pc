@@ -70,7 +70,7 @@ jobs:
       - name: Use tags
         run: |
           echo "tags=${{ steps.final_tags.outputs.tags }}"
-          echo "latest_tags=${{ steps.final_tags.outputs.tags }}"
+          echo "latest_tags=${{ steps.final_tags.outputs.latest_tags }}"
 
       # - name: Extract metadata (tags, labels) for Docker
       #   id: meta
