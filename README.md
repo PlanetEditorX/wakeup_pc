@@ -2,8 +2,6 @@
 
 ---
 
-该分支用于c重新构建，缩小镜像体积
-
 ### 一、使用docker
 
 ---
@@ -18,7 +16,7 @@
 
   - 使用`Publish Docker image`手动构建或直接打上tags自动构建
   - x86和arm64都可以使用，默认推荐镜像。
-  
+
 - arm64
   ```bash
   docker pull yexundao/wakeup_pc:latest-arm
@@ -28,7 +26,7 @@
   - 这种方式需要配置好自己的arm服务器的自建runner，连接仓库后arm版本在本地构建。
   - 自建runner安装方式参考 https://github.com/PlanetEditorX/wakeup_pc/settings/actions/runners/new 和 [在ARMbian系统上将自托管运行器注册为系统服务并使其在后台运行](attachment/在ARMbian系统上将自托管运行器注册为系统服务并使其在后台运行.md)
   - 不管哪种方式x86都可以使用，区别是使用`by self-hosted runner`方式将arm版本给区别出来，arm只能使用`latest-arm`镜像。
-  
+
 - 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本。
 - 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
 
@@ -59,7 +57,7 @@
         --network host \
         yexundao/wakeup_pc:latest
       ```
-    
+
     - arm64
       ```bash
       docker run -d \
@@ -70,9 +68,9 @@
         --network host \
         yexundao/wakeup_pc:latest
       ```
-      
+
       或自建runner版本
-      
+
       ```bash
       docker run -d \
         --name wakeup_pc \
