@@ -14,6 +14,7 @@ on:
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
+    # 分为两个jobs，amd64走在线ubuntu-latest运行器，arm64走自建运行器
     strategy:
       matrix:
         platform: [amd64, arm64]
@@ -30,7 +31,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Check runner
-        run: echo "Running on ${{ matrix.runner }}"
+        id: check_runner
+        run: echo "runner=${{ matrix.runner }}" >> $GITHUB_OUTPUT
 
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -54,13 +56,22 @@ jobs:
             echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Platforms Tags
+        id: final_tags
+        run: |
+          if [ -z "${{ steps.check_runner.outputs.runner == armbian }}" ]; then
+            echo "tags=${{ steps.use_tags_or_version.outputs.tags }},-arm64" >> $GITHUB_OUTPUT
+          else
+            echo "tags=${{ steps.use_tags_or_version.outputs.tags }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: yexundao/wakeup_pc
           tags: |
-                type=raw,value=${{ steps.use_tags_or_version.outputs.tags }}
+                type=raw,value=${{ steps.final_tags.outputs.tags }}
                 type=raw,value=latest
 
       - name: Build and push Docker image
