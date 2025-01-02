@@ -36,7 +36,8 @@
   - x86：`/vol1/1000/docker/wakeup/config.ini`
   - arm64：`/root/soft/wakeup/config.ini`
 
-- 按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini 
+- 按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini
+- 在本地调试时，可通过指令忽略配置文件，避免配置上传到仓库`git update-index --assume-unchanged ~/wakeup_pc/docker/config.ini`
 
 ##### 3. 运行镜像
 
