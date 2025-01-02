@@ -51,14 +51,6 @@ jobs:
                 type=raw,value=${{ steps.final_tags.outputs.tags }}
                 type=raw,value=latest
 
-      - name: Build and export to Docker
-        uses: docker/build-push-action@v5
-        with:
-          context: ./docker
-          file: ./docker/Dockerfile
-          load: true
-          tags: ${{ steps.meta.outputs.tags }}
-
       - name: Build and push
         uses: docker/build-push-action@v5
         with:

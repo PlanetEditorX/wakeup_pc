@@ -314,37 +314,11 @@ docker exec -it wakeup_pc sh
 
 ---
 
-### 四、docker和iStoreOS对比
+### 四、iStoreOS
 
----
-
-#### （一）docker
-
-##### 优势
-
-- 已有docker环境下配置快速，简单
-- 不受限于设备环境，几乎任何设备都是一样的操作
-
-##### 劣势
-
-- 占用空间较大（100MB左右）
-- 需要提前配置好docker网络环境，需要一点点docker相关的知识或能根据故障自己进行搜索排查
+查看py分支相关介绍，本之分支主要适用于docker https://github.com/PlanetEditorX/wakeup_pc/tree/py?tab=readme-ov-file#%E4%BA%8C%E4%BD%BF%E7%94%A8istoreos
 
 
----
-
-#### （二）iStoreOS
-
-##### 优势
-
-- 软件利用率高，本身系统安装的软件包在其它程序也可以使用
-- 新增占用空间较小，安装受网络环境影响小
-
-##### 劣势
-
-- 配置较慢，较繁琐
-- 可能存在使用不同Openwrt版本而出现有人配置成功，有人配置不成功或并不知道自己哪里出错的情况
-- 可能会出现用着用着突然无法使用的情况，重启也没用，软件包重装又正常.......
 
 ---
 
@@ -356,11 +330,17 @@ docker exec -it wakeup_pc sh
 
 ##### 触发
 
-```dockerfile
+```yml
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '输入版本号，格式为X.Y.Z'
+        required: true
+        default: ''
 ```
 - 打上`V*`标签并推送自动触发操作
   ```bash
@@ -369,22 +349,48 @@ on:
   ```
   - 根据需要修改`v2.0.0`→`va.b.c`和之后的描述
   - `v2.0.0`/`va.b.c`在工作流中将会提取`v2.0.0`/`a.b.c`作为标签打在镜像上，镜像上将会同时有两个tags：`v2.0.0`/`a.b.c`和`latest`
+  
+- `workflow_dispatch`是页面的`Run workflow`操作，输入的值保存在参数`github.event.inputs.version`中。
 
-##### 标签的获取
-```dockerfile
+##### 多平台镜像的action
+
+```yml
+- name: Set up QEMU
+  uses: docker/setup-qemu-action@v3
+
+- name: Set up Docker Buildx
+  uses: docker/setup-buildx-action@v3
+```
+
+##### 版本的获取
+
+```yml
+- name: Use tags or version
+  id: final_tags
+  run: |
+    if [ -z "${{ github.event.inputs.version }}" ]; then
+      echo "tags=${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+    else
+      echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+    fi
+```
+
+- 从页面输入或tags中获取版本信息
+
+```yml
 - name: Extract metadata (tags, labels) for Docker
   id: meta
   uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
   with:
-    images: 用户名/镜像名字
+    images: yexundao/wakeup_pc
     tags: |
-          type=semver,pattern={{version}}
+          type=raw,value=${{ steps.final_tags.outputs.tags }}
           type=raw,value=latest
 ```
-- 根据实际参数修改对应的名字，可直接在Docker Hub的镜像发布页查看
+- 根据实际参数修改对应的名字，可直接在Docker Hub的镜像发布页查看对应的版本号
 
 ##### Docker Hub的登录
-```dockerfile
+```yml
 - name: Log in to Docker Hub
   uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
   with:
@@ -398,18 +404,19 @@ on:
   - 密码参数为：`Name`：`DOCKER_PASSWORD`，`Secret`：`Docker Hub的密码`
 
 ##### 运行目录的配置
-```dockerfile
-- name: Build and push Docker image
-  id: push
-  uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+```yml
+- name: Build and push
+  uses: docker/build-push-action@v5
   with:
     context: ./docker
     file: ./docker/Dockerfile
+    platforms: linux/amd64,linux/arm64
     push: true
     tags: ${{ steps.meta.outputs.tags }}
     labels: ${{ steps.meta.outputs.labels }}
 ```
-- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改`context`和`file`为对应的路径
+- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改`context`和`file`为对应的路径。
+- 在`platforms: linux/amd64,linux/arm64`中指定了构造平台。
 
 ---
 
