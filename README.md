@@ -10,17 +10,19 @@
 
 #### （一）远程拉取（推荐）
 ##### 1. 拉取镜像
-```bash
-docker pull yexundao/wakeup_pc:latest
-```
-- 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本。
 
-- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
+- x86/实体机/虚拟机
+  ```bash
+  docker pull yexundao/wakeup_pc:latest
+  ```
 
-- 如果是arm64设备，如Armbian系统，拉取arm版本镜像
-```bash
+- arm64/Armbian
+  ```bash
   docker pull yexundao/wakeup_pc:latest-arm
-```
+  ```
+
+- 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本。
+- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
 
 
 ##### 2. 创建配置文件
@@ -39,7 +41,7 @@ docker pull yexundao/wakeup_pc:latest
 
   - 创建并启动容器
 
-    - x86版本
+    - x86/实体机/虚拟机
       ```bash
       docker run -d \
         --name wakeup_pc \
@@ -50,7 +52,7 @@ docker pull yexundao/wakeup_pc:latest
         yexundao/wakeup_pc:latest
       ```
     
-    - arm64版本
+    - arm64/Armbian
       ```bash
       docker run -d \
         --name wakeup_pc \
