@@ -61,7 +61,7 @@ jobs:
         id: final_tags
         run: |
           if [ -z "${{ steps.check_runner.outputs.runner == 'armbian' }}" ]; then
-            new_tags=${{ steps.use_tags_or_version.outputs.tags }}/arm64"
+            new_tags="${{ steps.use_tags_or_version.outputs.tags }}/arm64"
             echo "tags=${{ new_tags }}" >> $GITHUB_OUTPUT
           else
             echo "tags=${{ steps.use_tags_or_version.outputs.tags }}" >> $GITHUB_OUTPUT
