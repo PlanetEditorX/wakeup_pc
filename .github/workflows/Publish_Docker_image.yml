@@ -35,14 +35,14 @@ jobs:
         id: check_runner
         run: echo "runner=${{ matrix.runner }}" >> $GITHUB_OUTPUT
 
-      - name: Check out the repo
-        uses: actions/checkout@v4
+      # - name: Check out the repo
+      #   uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      # - name: Log in to Docker Hub
+      #   uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Get version
         id: get_version
@@ -61,7 +61,8 @@ jobs:
         id: final_tags
         run: |
           if [ -z "${{ steps.check_runner.outputs.runner == 'armbian' }}" ]; then
-            echo "tags=${{ steps.use_tags_or_version.outputs.tags }}/arm64" >> $GITHUB_OUTPUT
+            new_tags=${{ steps.use_tags_or_version.outputs.tags }}/arm64"
+            echo "tags=${{ new_tags }}" >> $GITHUB_OUTPUT
           else
             echo "tags=${{ steps.use_tags_or_version.outputs.tags }}" >> $GITHUB_OUTPUT
           fi
