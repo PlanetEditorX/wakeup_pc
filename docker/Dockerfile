@@ -1,5 +1,5 @@
 # 使用alpine作为基础镜像，并安装必要的编译工具和库
-FROM alpine:3.18.6 as builder
+FROM alpine:3.18.6 AS builder
 
 # 安装musl-dev和libc-dev，它们包含了C标准库的头文件和静态库
 RUN apk add --no-cache musl-dev libc-dev gcc
