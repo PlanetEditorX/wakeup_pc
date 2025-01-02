@@ -4,11 +4,26 @@ on:
   push:
     tags:
       - "v*"
-
+  # 手动CI构建按钮增加
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '输入版本号'
+        required: true
+        default: ''
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    # runs-on: ${{ matrix.runner }}
+    # strategy:
+    #   matrix:
+    #     platform: [amd64, arm64]
+    #     include:
+    #       - platform: arm64
+    #         runner: armbian
+    #       - platform: amd64
+    #         runner: ubuntu-latest
     permissions:
       packages: write
       contents: read
@@ -33,6 +48,14 @@ jobs:
                 type=semver,pattern={{version}}
                 type=raw,value=latest
 
+      - name: Use tags or version
+        id: use_tags_or_version
+        run: |
+          if [ -z "${{ steps.meta.outputs.tags }}" ]; then
+            echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tags=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
+          fi
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -40,5 +63,5 @@ jobs:
           context: ./docker
           file: ./docker/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.use_tags_or_version.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
