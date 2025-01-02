@@ -48,22 +48,19 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
       - name: Use tags or version
-        id: use_tags_or_version
-        run: |
-          if [ -z "${{ github.event.inputs.version }}" ]; then
-            echo "tags=${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
-          else
-            echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Platforms Tags
         id: final_tags
         run: |
+          if [ -z "${{ github.event.inputs.version }}" ]; then
+            tags=${{ steps.get_version.outputs.VERSION }}
+          else
+            tags=${{ github.event.inputs.version }}
+          fi
+
           if [ "${{ steps.check_runner.outputs.runner }}" == "armbian" ]; then
-            echo "tags=${{ steps.use_tags_or_version.outputs.tags }}/arm" >> $GITHUB_OUTPUT
+            echo "tags=$tags/arm" >> $GITHUB_OUTPUT
             echo "latest_tags=latest/arm" >> $GITHUB_OUTPUT
           else
-            echo "tags=${{ steps.use_tags_or_version.outputs.tags }}" >> $GITHUB_OUTPUT
+            echo "tags=$tags" >> $GITHUB_OUTPUT
             echo "latest_tags=latest" >> $GITHUB_OUTPUT
           fi
 
