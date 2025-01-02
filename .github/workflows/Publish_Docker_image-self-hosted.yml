@@ -1,9 +1,9 @@
 name: Publish Docker image by self-hosted runner
 
 on:
-  push:
-    tags:
-      - "v*"
+  # push:
+  #   tags:
+  #     - "v*"
   # 手动CI构建按钮增加
   workflow_dispatch:
     inputs:
