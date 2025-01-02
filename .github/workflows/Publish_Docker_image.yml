@@ -34,14 +34,14 @@ jobs:
         id: check_runner
         run: echo "runner=${{ matrix.runner }}" >> $GITHUB_OUTPUT
 
-      # - name: Check out the repo
-      #   uses: actions/checkout@v4
+      - name: Check out the repo
+        uses: actions/checkout@v4
 
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Get version
         id: get_version
@@ -64,26 +64,21 @@ jobs:
             echo "latest_tags=latest" >> $GITHUB_OUTPUT
           fi
 
-      - name: Use tags
-        run: |
-          echo "tags=${{ steps.final_tags.outputs.tags }}"
-          echo "latest_tags=${{ steps.final_tags.outputs.latest_tags }}"
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: yexundao/wakeup_pc
+          tags: |
+                type=raw,value=${{ steps.final_tags.outputs.tags }}
+                type=raw,value=${{ steps.final_tags.outputs.latest_tags }}
 
-      # - name: Extract metadata (tags, labels) for Docker
-      #   id: meta
-      #   uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-      #   with:
-      #     images: yexundao/wakeup_pc
-      #     tags: |
-      #           type=raw,value=${{ steps.final_tags.outputs.tags }}
-      #           type=raw,value=latest
-
-      # - name: Build and push Docker image
-      #   id: push
-      #   uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-      #   with:
-      #     context: ./docker
-      #     file: ./docker/Dockerfile
-      #     push: true
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
