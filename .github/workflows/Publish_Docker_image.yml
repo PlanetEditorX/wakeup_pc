@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "v*"
-  # 手动CI构建按钮增加
   workflow_dispatch:
     inputs:
       version:
@@ -12,36 +11,23 @@ on:
         required: true
         default: ''
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
-    # 分为两个jobs，amd64走在线ubuntu-latest运行器，arm64走自托管运行器
-    strategy:
-      matrix:
-        platform: [amd64, arm64]
-        include:
-          - platform: amd64
-            runner: ubuntu-latest
-          - platform: arm64
-            runner: armbian
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
-    runs-on: ${{ matrix.runner }}
+  docker:
+    runs-on: ubuntu-latest
     steps:
-      - name: Check runner
-        id: check_runner
-        run: echo "runner=${{ matrix.runner }}" >> $GITHUB_OUTPUT
-
-      - name: Check out the repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Get version
         id: get_version
@@ -51,17 +37,9 @@ jobs:
         id: final_tags
         run: |
           if [ -z "${{ github.event.inputs.version }}" ]; then
-            tags=${{ steps.get_version.outputs.VERSION }}
+            echo "tags=${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
           else
-            tags=${{ github.event.inputs.version }}
-          fi
-
-          if [ "${{ steps.check_runner.outputs.runner }}" == "armbian" ]; then
-            echo "tags=$tags-arm" >> $GITHUB_OUTPUT
-            echo "latest_tags=latest-arm" >> $GITHUB_OUTPUT
-          else
-            echo "tags=$tags" >> $GITHUB_OUTPUT
-            echo "latest_tags=latest" >> $GITHUB_OUTPUT
+            echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Extract metadata (tags, labels) for Docker
@@ -71,14 +49,22 @@ jobs:
           images: yexundao/wakeup_pc
           tags: |
                 type=raw,value=${{ steps.final_tags.outputs.tags }}
-                type=raw,value=${{ steps.final_tags.outputs.latest_tags }}
+                type=raw,value=latest
 
-      - name: Build and push Docker image
-        id: push
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      - name: Build and export to Docker
+        uses: docker/build-push-action@v5
         with:
           context: ./docker
           file: ./docker/Dockerfile
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
