@@ -17,11 +17,10 @@ jobs:
     # 分为两个jobs，amd64走在线ubuntu-latest运行器，arm64走自建运行器
     strategy:
       matrix:
-        # platform: [amd64, arm64]
-        platform: [arm64]
+        platform: [amd64, arm64]
         include:
-          # - platform: amd64
-          #   runner: ubuntu-latest
+          - platform: amd64
+            runner: ubuntu-latest
           - platform: arm64
             runner: armbian
     permissions:
@@ -61,7 +60,7 @@ jobs:
         id: final_tags
         run: |
           if [ "${{ steps.check_runner.outputs.runner }}" == "armbian" ]; then
-            echo "tags=${{ steps.use_tags_or_version.outputs.tags }}-armbian" >> $GITHUB_OUTPUT
+            echo "tags=${{ steps.use_tags_or_version.outputs.tags }}/arm" >> $GITHUB_OUTPUT
           else
             echo "tags=${{ steps.use_tags_or_version.outputs.tags }}" >> $GITHUB_OUTPUT
           fi
