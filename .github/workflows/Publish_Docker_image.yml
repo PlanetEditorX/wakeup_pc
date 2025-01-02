@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: '输入版本号'
+        description: '输入正式的版本号，格式为 X.Y.Z，如：2.0.0'
         required: true
         default: ''
 jobs:
