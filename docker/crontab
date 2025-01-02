@@ -1,1 +1,0 @@
-0 */1 * * * ps | grep wakeup.py | grep -v grep | awk '{print $1}' | xargs kill -9; nohup /usr/bin/python3 -u /wakeup.py 1 > /log.txt &
