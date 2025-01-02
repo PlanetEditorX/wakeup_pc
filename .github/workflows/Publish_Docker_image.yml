@@ -17,10 +17,11 @@ jobs:
     # 分为两个jobs，amd64走在线ubuntu-latest运行器，arm64走自建运行器
     strategy:
       matrix:
-        platform: [amd64, arm64]
+        # platform: [amd64, arm64]
+        platform: [arm64]
         include:
-          - platform: amd64
-            runner: ubuntu-latest
+          # - platform: amd64
+          #   runner: ubuntu-latest
           - platform: arm64
             runner: armbian
     permissions:
