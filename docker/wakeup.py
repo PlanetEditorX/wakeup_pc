@@ -21,10 +21,8 @@ topic = config.get('bafa', 'topic').strip('"')
 ssh_ip = config.get('openssh', 'ip').strip('"')
 ssh_user = config.get('openssh', 'user').strip('"')
 ssh_password = config.get('openssh', 'password').strip('"')
-# 局域网网络唤醒
-cmd1 = 'wakeonlan ' + config.get('interface', 'mac').strip('"')
 # 局域网连接openssh服务器，进行关机操作
-cmd3 = 'sshpass -p %(password)s ssh -A -g -o StrictHostKeyChecking=no %(user)s@%(ip)s "shutdown -s -t 10"'%{"password": ssh_password, "user": ssh_user, "ip": ssh_ip}
+cmd_shutdown = 'sshpass -p %(password)s ssh -A -g -o StrictHostKeyChecking=no %(user)s@%(ip)s "shutdown -s -t 10"'%{"password": ssh_password, "user": ssh_user, "ip": ssh_ip}
 
 def connTCP():
     global tcp_client_socket
@@ -70,6 +68,19 @@ def check_url(url=ssh_ip, timeout=10):
 		print(f"无法连接到 {url}:{22}，错误：{e}")
 		return False
 
+# 网络唤醒
+def wake_on_lan(mac):
+    # 将MAC地址中的短横线去掉并转换为二进制格式
+    mac = mac.lower().replace(":", "").replace("-", "")
+    if len(mac) != 12:
+        raise ValueError("格式错误的 MAC 地址")
+    # 创建魔法包
+    magic_packet = bytes.fromhex('FF' * 6 + mac * 16)
+    # 发送魔法包到广播地址
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # 设置为广播
+        sock.sendto(magic_packet, ('<broadcast>', 9))  # 发送到端口9的广播地址
+
 while True:
 	# 接收服务器发送过来的数据
 	recvData = tcp_client_socket.recv(1024)
@@ -82,15 +93,15 @@ while True:
 			if str(sw) == str("on"):
 				try:
 					print("正在打开电脑")
-					os.system(cmd1)
+					wake_on_lan(config.get('interface', 'mac').strip('"'))
 				except:
 					print("打开电脑失败")
 			else:
 				try:
 					print("正在关闭电脑")
 					if check_url():
-						print(f"执行命令:{cmd3}")
-						os.system(cmd3)
+						print(f"执行命令:{cmd_shutdown}")
+						os.system(cmd_shutdown)
 					else:
 						print("目标PC未在线或SSH服务器未开启")
 				except:
