@@ -71,16 +71,21 @@ def check_url(url=ssh_ip, timeout=10):
 
 # 网络唤醒
 def wake_on_lan(mac):
-    # 将MAC地址中的短横线去掉并转换为二进制格式
-    mac = mac.lower().replace(":", "").replace("-", "")
-    if len(mac) != 12:
-        raise ValueError("格式错误的 MAC 地址")
-    # 创建魔法包
-    magic_packet = bytes.fromhex('FF' * 6 + mac * 16)
-    # 发送魔法包到广播地址
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # 设置为广播
-        sock.sendto(magic_packet, ('<broadcast>', 9))  # 发送到端口9的广播地址
+	try:
+		print(f"正在向局域网发送MAC地址为{mac}的唤醒魔法包....")
+		# 将MAC地址中的短横线去掉并转换为二进制格式
+		mac = mac.lower().replace(":", "").replace("-", "")
+		if len(mac) != 12:
+			raise ValueError("格式错误的 MAC 地址")
+		# 创建魔法包
+		magic_packet = bytes.fromhex('FF' * 6 + mac * 16)
+		# 发送魔法包到广播地址
+		with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+			sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # 设置为广播
+			sock.sendto(magic_packet, ('<broadcast>', 9))  # 发送到端口9的广播地址
+			print(f"唤醒魔法包发送成功")
+	except Exception as e:
+		print(f"网络唤醒失败！{e}")
 
 while True:
 	# 接收服务器发送过来的数据
