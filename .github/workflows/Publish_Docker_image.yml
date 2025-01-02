@@ -67,7 +67,7 @@ jobs:
           fi
 
       - name: Use tags
-        run: echo "${{ steps.set_tags.outputs.tags }}"
+        run: echo "${{ steps.final_tags.outputs.tags }}"
 
       # - name: Extract metadata (tags, labels) for Docker
       #   id: meta
