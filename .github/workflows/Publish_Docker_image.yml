@@ -57,8 +57,8 @@ jobs:
           fi
 
           if [ "${{ steps.check_runner.outputs.runner }}" == "armbian" ]; then
-            echo "tags=$tags/arm" >> $GITHUB_OUTPUT
-            echo "latest_tags=latest/arm" >> $GITHUB_OUTPUT
+            echo "tags=$tags-arm" >> $GITHUB_OUTPUT
+            echo "latest_tags=latest-arm" >> $GITHUB_OUTPUT
           else
             echo "tags=$tags" >> $GITHUB_OUTPUT
             echo "latest_tags=latest" >> $GITHUB_OUTPUT
