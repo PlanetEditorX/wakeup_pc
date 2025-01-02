@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED=1
 # 安装必要依赖
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
     apk update && \
-    apk add --no-cache python3 curl openssh wakeonlan cronie sshpass
+    apk add --no-cache python3 openssh wakeonlan cronie sshpass
 
 # 复制python脚本
 COPY wakeup.py /wakeup.py
