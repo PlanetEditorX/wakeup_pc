@@ -61,12 +61,16 @@ jobs:
         run: |
           if [ "${{ steps.check_runner.outputs.runner }}" == "armbian" ]; then
             echo "tags=${{ steps.use_tags_or_version.outputs.tags }}/arm" >> $GITHUB_OUTPUT
+            echo "latest_tags=latest/arm" >> $GITHUB_OUTPUT
           else
             echo "tags=${{ steps.use_tags_or_version.outputs.tags }}" >> $GITHUB_OUTPUT
+            echo "latest_tags=latest" >> $GITHUB_OUTPUT
           fi
 
       - name: Use tags
-        run: echo "${{ steps.final_tags.outputs.tags }}"
+        run: |
+          echo "tags=${{ steps.final_tags.outputs.tags }}"
+          echo "latest_tags=${{ steps.final_tags.outputs.tags }}"
 
       # - name: Extract metadata (tags, labels) for Docker
       #   id: meta
