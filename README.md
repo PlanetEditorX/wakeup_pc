@@ -32,20 +32,23 @@
 
 
 ##### 2. 创建配置文件
-（1）在指定位置创建config.ini文件，如：`/vol1/1000/docker/wakeup/config.ini`
+- 在任意指定位置创建`config.ini`文件，如：
+  - x86：`/vol1/1000/docker/wakeup/config.ini`
+  - arm64：`/root/soft/wakeup/config.ini`
 
-（2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
+- 按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini 
 
 ##### 3. 运行镜像
 
 - 带日志和配置命令启动
 
-  - 在宿主机上配置文件目录下提前建立日志文件
-    ```bash
-    touch /vol1/1000/docker/wakeup/log.txt
-    ```
-
-  - 创建并启动容器（带配置文件和日志文件）
+  - 在宿主机配置文件目录下提前建立日志文件，如：
+    
+    - x86：`touch /vol1/1000/docker/wakeup/log.txt`
+    
+    - arm64：`touch /root/soft/wakeup/log.txt`
+    
+  - 创建并启动容器
 
     - x86
       ```bash
