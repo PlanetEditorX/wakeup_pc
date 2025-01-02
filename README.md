@@ -45,9 +45,9 @@
     touch /vol1/1000/docker/wakeup/log.txt
     ```
 
-  - 创建并启动容器
+  - 创建并启动容器（带配置文件和日志文件）
 
-    - x86/arm64
+    - x86
       ```bash
       docker run -d \
         --name wakeup_pc \
@@ -349,7 +349,7 @@ on:
   ```
   - 根据需要修改`v2.0.0`→`va.b.c`和之后的描述
   - `v2.0.0`/`va.b.c`在工作流中将会提取`v2.0.0`/`a.b.c`作为标签打在镜像上，镜像上将会同时有两个tags：`v2.0.0`/`a.b.c`和`latest`
-  
+
 - `workflow_dispatch`是页面的`Run workflow`操作，输入的值保存在参数`github.event.inputs.version`中。
 
 ##### 多平台镜像的action
