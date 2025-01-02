@@ -12,7 +12,8 @@ script_path = os.path.abspath(__file__)
 config_path = os.path.join(os.path.dirname(script_path), 'config.ini')
 
 config = configparser.ConfigParser()
-config.read(config_path)
+# 指定编码为UTF-8，并读取配置文件
+config.read(config_path, encoding='utf-8')
 
 # 巴法云私钥
 client_id = config.get('bafa', 'client_id').strip('"')
