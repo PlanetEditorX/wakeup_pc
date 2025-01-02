@@ -14,23 +14,24 @@ on:
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
-    # runs-on: ubuntu-latest
-    runs-on: [self-hosted, armbian]
-    # runs-on: ${{ matrix.runner }}
-    # strategy:
-    #   matrix:
-    #     platform: [amd64, arm64]
-    #     include:
-    #       - platform: amd64
-    #         runner: ubuntu-latest
-    #       - platform: arm64
-    #         runner: armbian
+    strategy:
+      matrix:
+        platform: [amd64, arm64]
+        include:
+          - platform: amd64
+            runner: ubuntu-latest
+          - platform: arm64
+            runner: [self-hosted, armbian]
     permissions:
       packages: write
       contents: read
       attestations: write
       id-token: write
+    runs-on: ${{ matrix.runner }}
     steps:
+      - name: Check runner
+        run: echo "Running on ${{ matrix.runner }}"
+
       - name: Check out the repo
         uses: actions/checkout@v4
 
