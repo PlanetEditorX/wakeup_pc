@@ -23,6 +23,9 @@ jobs:
       run: |
         # 读取最新版本号并分割为数组
         IFS='.' read -r major minor patch <<< $LATEST_TAG
+        echo $major
+        echo $minor
+        echo $patch
         # 递增补丁版本号
         patch=$((patch + 1))
         # 如果补丁版本号达到10，重置为0并递增次版本号
@@ -36,6 +39,9 @@ jobs:
             fi
         fi
         # 构造新版本号
+        echo $major
+        echo $minor
+        echo $patch
         NEW_VERSION="$major.$minor.$patch"
         echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
