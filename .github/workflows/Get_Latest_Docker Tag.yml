@@ -14,14 +14,13 @@ jobs:
 
     - name: Get latest Docker tag
       run: |
-        TAGS_URL="https://registry.hub.docker.com/v2/namespaces/yexundao/repositories/wakeup_pc/tags"
+        TAGS_URL="https://registry.hub.docker.com/v2/namespaces/yexundao/repositories/wakeup_pc/tags?page=2&page_size=1"
         TAGS_RESPONSE=$(curl -s $TAGS_URL)
         echo "TAGS_RESPONSE=$TAGS_RESPONSE" >> $GITHUB_ENV
         # 使用jq解析JSON并获取最新版本号
         # 版本号是语义化版本控制格式，例如"3.0.6"
-        LATEST_TAG=$(echo $TAGS_RESPONSE | jq -r '.results[] | select(.name | startswith("v")) | .name' | sort -V | tail -n1)
-        echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
+        # LATEST_TAG=$(echo $TAGS_RESPONSE | jq -r '.results[] | select(.name | startswith("v")) | .name' | sort -V | tail -n1)
+        # echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
 
     - name: Show latest tag
-      run: echo $LATEST_TAG && \
-           echo $TAGS_RESPONSE && \
+      run: echo $LATEST_TAG
