@@ -25,5 +25,5 @@ jobs:
     - name: Show tag INFO
       run: echo $LATEST_TAG
     - name: Show latest tag
-      run: echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1
+      run: echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}'
 
