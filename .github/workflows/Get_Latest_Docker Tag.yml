@@ -43,10 +43,10 @@ jobs:
       run: echo $NEW_VERSION
 
 
-    - name: Increment version 50 times
+    - name: test Increment version 100 times
       run: |
         IFS='.' read -r major minor patch <<< $LATEST_TAG
-        for i in $(seq 1 50); do
+        for i in $(seq 1 100); do
           # 递增补丁版本号
           patch=$((patch + 1))
           # 如果补丁版本号达到10，重置为0并递增次版本号
