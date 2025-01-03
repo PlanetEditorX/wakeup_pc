@@ -4,26 +4,56 @@ import threading
 import time
 import os
 import configparser
+import sys
+from pathlib import Path
 
-# 获取脚本的绝对路径
-script_path = os.path.abspath(__file__)
-
-# 获取同级目录下的文件的绝对路径
-config_path = os.path.join(os.path.dirname(script_path), 'config.ini')
-
+# 重读配置次数
+read_config_time = 10
 config = configparser.ConfigParser()
-# 指定编码为UTF-8，并读取配置文件
-config.read(config_path, encoding='utf-8')
+# 读取配置文件
+def read_config():
+	print('Read config.ini......')
+	# 构建config.ini文件的路径
+	inside_config_path = Path(__file__).parent / 'config.ini'
+	external_config_path = Path(sys.executable).parent / 'config.ini'
+	# 外部文件存在读取外部文件
+	if external_config_path.exists():
+		print(f'Read from {external_config_path}.....')
+		config_path = external_config_path
+	else:
+		print(f'Read from {inside_config_path}.....')
+		config_path = inside_config_path
+	config.read(config_path)
+	if (Path(config_path).exists() and config.get('bafa', 'client_id')):
+		print("Read configuration")
+	else:
+		print("ERROR: Configuration not read......")
+		print("Please waiting......")
+		time.sleep(10)
+		global read_config_time
+		if read_config_time:
+			read_config_time -= 1
+			read_config()
 
-# 巴法云私钥
-client_id = config.get('bafa', 'client_id').strip('"')
-# 主题值
-topic = config.get('bafa', 'topic').strip('"')
-ssh_ip = config.get('openssh', 'ip').strip('"')
-ssh_user = config.get('openssh', 'user').strip('"')
-ssh_password = config.get('openssh', 'password').strip('"')
-# 局域网连接openssh服务器，进行关机操作
-cmd_shutdown = 'sshpass -p %(password)s ssh -A -g -o StrictHostKeyChecking=no %(user)s@%(ip)s "shutdown -s -t 10"'%{"password": ssh_password, "user": ssh_user, "ip": ssh_ip}
+read_config()
+
+try:
+	# 巴法云私钥
+	client_id = config.get('bafa', 'client_id').strip('"')
+	if (not client_id):
+		raise ValueError
+	# 主题值
+	topic = config.get('bafa', 'topic').strip('"')
+	ssh_ip = config.get('openssh', 'ip').strip('"')
+	ssh_user = config.get('openssh', 'user').strip('"')
+	ssh_password = config.get('openssh', 'password').strip('"')
+	# 局域网连接openssh服务器，进行关机操作
+	cmd_shutdown = 'sshpass -p %(password)s ssh -A -g -o StrictHostKeyChecking=no %(user)s@%(ip)s "shutdown -s -t 10"'%{"password": ssh_password, "user": ssh_user, "ip": ssh_ip}
+	print(f"cmd_shutdown={cmd_shutdown}")
+except:
+	time.sleep(2)
+	print("ERROR: No valid configuration was read!!!\nPlease check config.ini!\nProgram exit")
+	sys.exit()  # 退出进程
 
 def connTCP():
     global tcp_client_socket
