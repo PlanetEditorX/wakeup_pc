@@ -131,7 +131,7 @@ while True:
 			print(f'recv: {res}')
 			if res == 'cmd=1&res=1':
 				print('Subscription topic successful.')
-			else:
+			elif res == 'cmd=0&res=1':
 				print('Received topic publishing data.')
 				sw = str(res.split('&')[3].split('=')[1]).strip()
 				if str(sw) == str("on"):
@@ -152,6 +152,8 @@ while True:
 						time.sleep(2)
 				else:
 					print("获取的指令不是 'on' 或 'off'")
+			else:
+				print("Unexpected return recv!")
 		except:
 			time.sleep(2)
 	else:
