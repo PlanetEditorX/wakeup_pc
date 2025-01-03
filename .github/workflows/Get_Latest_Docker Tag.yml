@@ -19,7 +19,7 @@ jobs:
         echo "TAGS_RESPONSE=$TAGS_RESPONSE" >> $GITHUB_ENV
 
     - name: Show latest tag
-      run: echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}'
+      run: echo "LATEST_TAG=$TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}'" >> $GITHUB_ENV
 
     - name: Increment version
       run: |
