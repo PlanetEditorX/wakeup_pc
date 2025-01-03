@@ -7,7 +7,6 @@ import configparser
 import sys
 from pathlib import Path
 
-
 # 打开一个文件用于写入
 f = open('log.txt', 'w', buffering=1)
 # 将标准输出重定向到文件
