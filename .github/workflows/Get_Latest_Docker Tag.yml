@@ -1,0 +1,66 @@
+name: Get Latest Docker Tag
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  get-latest-tag:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Get latest Docker tag
+      run: |
+        TAGS_URL="https://registry.hub.docker.com/v2/namespaces/yexundao/repositories/wakeup_pc/tags?page=2&page_size=1"
+        TAGS_RESPONSE=$(curl -s $TAGS_URL)
+        LATEST_TAG=$(echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}')
+        echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+    - name: Increment version
+      run: |
+        # 读取最新版本号并分割为数组
+        IFS='.' read -r major minor patch <<< $LATEST_TAG
+        # 递增补丁版本号
+        patch=$((patch + 1))
+        # 如果补丁版本号达到10，重置为0并递增次版本号
+        if [ $patch -eq 10 ]; then
+            patch=0
+            minor=$((minor + 1))
+            # 如果次版本号达到10，重置为0并递增主版本号
+            if [ $minor -eq 10 ]; then
+                minor=0
+                major=$((major + 1))
+            fi
+        fi
+        # 构造新版本号
+        NEW_VERSION="$major.$minor.$patch"
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+    - name: Show new version
+      run: echo $NEW_VERSION
+
+
+    - name: test Increment version 100 times
+      run: |
+        IFS='.' read -r major minor patch <<< $LATEST_TAG
+        for i in $(seq 1 100); do
+          # 递增补丁版本号
+          patch=$((patch + 1))
+          # 如果补丁版本号达到10，重置为0并递增次版本号
+          if [ $patch -eq 10 ]; then
+              patch=0
+              minor=$((minor + 1))
+              # 如果次版本号达到10，重置为0并递增主版本号
+              if [ $minor -eq 10 ]; then
+                  minor=0
+                  major=$((major + 1))
+              fi
+          fi
+          # 构造新版本号
+          NEW_VERSION="$major.$minor.$patch"
+          echo "Iteration $i: New version is $NEW_VERSION"
+        done
