@@ -19,7 +19,7 @@ jobs:
         echo "TAGS_RESPONSE=$TAGS_RESPONSE" >> $GITHUB_ENV
 
     - name: Show latest tag
-      run: echo "$TAGS_RESPONSE"
+      run: echo $TAGS_RESPONSE
 
     - name: Increment version
       run: |
