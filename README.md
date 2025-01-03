@@ -49,6 +49,8 @@
     
     - arm64：`touch /root/soft/wakeup/log.txt`
     
+    - 注意：如果带日志命令却没有创建日志文件，docker容器将会自动创建一个`log.txt`的目录，无法正常输出日志
+    
   - 创建并启动容器
 
     - x86
@@ -203,7 +205,21 @@ docker exec -it wakeup_pc sh
 ```
 
 ---
-#### （三）修改配置文件
+#### （三）利用Actions构建docker镜像
+
+##### 1. <span class='custom-title-span'>按照说明逐一修改配置文件</span>
+
+- 主要为两个流程`Publish Docker Image C` 和 `Publish Docker Image Python`，`Publish Docker Image main`实际指向C，只是增加了tags触发。
+  ![image-20250103150452629](attachment/image-20250103150452629.png)
+
+- 选择哪种语言直接点击工作流后，点击Run workflow就可以创建并推送对应语言的镜像到Docker Hub，实际使用并无多大差别，直接拉取最新的`latest`镜像就可以，无需在意具体的版本
+
+![image-20250103150936440](attachment/image-20250103150936440.png)
+
+![image-20250103151210735](attachment/image-20250103151210735.png)
+
+#### （四）修改配置文件
+
 ##### 1. <span class='custom-title-span'>按照说明逐一修改配置文件</span>
 ##### 2. 巴法云私钥/client_id
 - ![](attachment/edbafcef17a510c7a8458197b5457e0db13bece2a8efa74a5a62f44d5aad4dca.png)
