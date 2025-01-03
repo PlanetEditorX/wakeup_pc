@@ -81,7 +81,7 @@ jobs:
         with:
           images: yexundao/wakeup_pc
           tags: |
-                type=raw,value=${{ steps.final_tags.outputs.tags }}
+                type=raw,value=${{ steps.final_tags.outputs.tags }}-python
                 type=raw,value=latest
 
       - name: Build and push
