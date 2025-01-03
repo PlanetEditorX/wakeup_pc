@@ -69,7 +69,7 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.version }}" != "" ]; then
             echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.inputs.version }}" != "" ]; then
+          elif [ "${{ steps.get_version.outputs.VERSION }}" != "" ]; then
             echo "tags=${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
           else
             echo "tags=$NEW_VERSION" >> $GITHUB_OUTPUT
