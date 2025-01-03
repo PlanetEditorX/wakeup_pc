@@ -32,7 +32,7 @@ jobs:
             # 如果次版本号达到10，重置为0并递增主版本号
             if [ $minor -eq 10 ]; then
                 minor=0
-                major=$((major + 1)
+                major=$((major + 1))
             fi
         fi
         # 构造新版本号
