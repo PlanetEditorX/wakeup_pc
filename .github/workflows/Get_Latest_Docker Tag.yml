@@ -15,16 +15,13 @@ jobs:
     - name: Get latest Docker tag
       run: |
         TAGS_URL="https://registry.hub.docker.com/v2/namespaces/yexundao/repositories/wakeup_pc/tags?page=2&page_size=1"
-        TAGS_RESPONSE=$(curl -s $TAGS_URL)
+        TAGS_RESPONSE=$(curl -s $TAGS_URL) | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}'
         echo "TAGS_RESPONSE=$TAGS_RESPONSE" >> $GITHUB_ENV
-
-    - name: Show latest tag
-      run: echo "LATEST_TAG=$TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}'" >> $GITHUB_ENV
 
     - name: Increment version
       run: |
         # 读取最新版本号并分割为数组
-        IFS='.' read -r major minor patch <<< $LATEST_TAG
+        IFS='.' read -r major minor patch <<< $TAGS_RESPONSE
         # 递增补丁版本号
         patch=$((patch + 1))
         # 如果补丁版本号达到10，重置为0并递增次版本号
