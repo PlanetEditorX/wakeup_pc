@@ -22,6 +22,12 @@ sys.stdout = open('log.txt', 'w')
 original_print = print
 print = print_to_log.__get__(sys.stdout, sys.stdout.__class__)
 
+
+# 打开一个文件用于写入
+f = open('log.txt', 'w', buffering=1)
+# 将标准输出重定向到文件
+sys.stdout = f
+
 # 重读配置次数
 read_config_time = 10
 config = configparser.ConfigParser()
