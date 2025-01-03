@@ -1,9 +1,9 @@
-name: Publish Docker Image C
+name: Publish Docker Image main
 
 on:
-  # push:
-  #   tags:
-  #     - "v*"
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       version:
