@@ -6,7 +6,21 @@ import os
 import configparser
 import sys
 from pathlib import Path
+import logging
 
+# 配置 logging 模块
+logging.basicConfig(filename='log.txt', level=logging.INFO, format='%(message)s')
+# 定义一个包装器函数来捕获 print 调用
+def print_to_log(*args, **kwargs):
+    for arg in args:
+        logging.info(arg)
+    if kwargs.get('end') != '\n':  # 如果 print 没有以换行符结束，添加一个
+        logging.info("")
+
+# 将 print 函数替换为包装器函数
+sys.stdout = open('log.txt', 'w')
+original_print = print
+print = print_to_log.__get__(sys.stdout, sys.stdout.__class__)
 # 重读配置次数
 read_config_time = 10
 config = configparser.ConfigParser()
