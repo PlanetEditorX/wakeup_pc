@@ -132,15 +132,17 @@ while True:
 			if res == 'cmd=1&res=1':
 				print('Subscription topic successful.')
 			elif res == 'cmd=0&res=1':
-				print('Received topic publishing data.')
+				print('Heartbeat sent successful.')
+			else:
 				sw = str(res.split('&')[3].split('=')[1]).strip()
-				if str(sw) == str("on"):
+				print('Received topic publishing data.')
+				if sw == "on":
 					try:
 						print("正在打开电脑...")
 						wake_on_lan(config.get('interface', 'mac').strip('"'))
 					except:
 						print("电脑开机指令发送失败!")
-				elif str(sw) == str("off"):
+				elif sw == "off":
 					try:
 						print("正在关闭电脑")
 						if check_url():
@@ -152,8 +154,6 @@ while True:
 						time.sleep(2)
 				else:
 					print("获取的指令不是 'on' 或 'off'")
-			else:
-				print("Unexpected return recv!")
 		except:
 			time.sleep(2)
 	else:
