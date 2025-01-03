@@ -41,3 +41,26 @@ jobs:
 
     - name: Show new version
       run: echo $NEW_VERSION
+
+
+    - name: Increment version 50 times
+      run: |
+        IFS='.' read -r major minor patch <<< $LATEST_TAG
+        for i in $(seq 1 50); do
+          # 递增补丁版本号
+          patch=$((patch + 1))
+          # 如果补丁版本号达到10，重置为0并递增次版本号
+          if [ $patch -eq 10 ]; then
+              patch=0
+              minor=$((minor + 1))
+              # 如果次版本号达到10，重置为0并递增主版本号
+              if [ $minor -eq 10 ]; then
+                  minor=0
+                  major=$((major + 1))
+              fi
+          fi
+          # 构造新版本号
+          NEW_VERSION="$major.$minor.$patch"
+          echo "Iteration $i: New version is $NEW_VERSION"
+        done
+      shell: /bin/bash
