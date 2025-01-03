@@ -16,8 +16,14 @@ jobs:
       run: |
         TAGS_URL="https://registry.hub.docker.com/v2/namespaces/yexundao/repositories/wakeup_pc/tags?page=2&page_size=1"
         TAGS_RESPONSE=$(curl -s $TAGS_URL)
-        echo "TAGS_RESPONSE=$TAGS_RESPONSE" >> $GITHUB_ENV
+        LATEST_TAG=$(echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}')
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
 
-    - name: Show latest tag
-      run: echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1 | awk -F'-' '{print $1}'
+    # - name: Increment version
+    #   run: |
+    #     ./increment_version.sh $LATEST_TAG > new_version.txt
+    #     NEW_VERSION=$(cat new_version.txt)
+    #     echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
+    - name: Show new version
+      run: echo $latest_tag
