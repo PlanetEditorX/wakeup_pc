@@ -63,4 +63,3 @@ jobs:
           NEW_VERSION="$major.$minor.$patch"
           echo "Iteration $i: New version is $NEW_VERSION"
         done
-      shell: /bin/bash
