@@ -22,5 +22,8 @@ jobs:
         # LATEST_TAG=$(echo $TAGS_RESPONSE | jq -r '.results[] | select(.name | startswith("v")) | .name' | sort -V | tail -n1)
         # echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
 
-    - name: Show latest tag
+    - name: Show tag INFO
       run: echo $LATEST_TAG
+    - name: Show latest tag
+      run: echo $TAGS_RESPONSE | jq -r '.results[] | .name' | sort -V | tail -n1
+
