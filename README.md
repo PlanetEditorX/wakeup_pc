@@ -27,7 +27,7 @@
   - 自建runner安装方式参考 https://github.com/PlanetEditorX/wakeup_pc/settings/actions/runners/new 和 [在ARMbian系统上将自托管运行器注册为系统服务并使其在后台运行](attachment/在ARMbian系统上将自托管运行器注册为系统服务并使其在后台运行.md)
   - 不管哪种方式x86都可以使用，区别是使用`by self-hosted runner`方式将arm版本给区别出来，arm只能使用`latest-arm`镜像。
 
-- 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本。
+- 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本，需要python版本需要手动执行Publish Docker Image Python的Actions
 - 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
 
 
