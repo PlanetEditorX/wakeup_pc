@@ -28,7 +28,7 @@ sleep 1
 
 # 使wakeup可执行
 echo "Wakeup adds executable permissions......" >> log.txt
-chmod +x ./wakeup
+chmod +x wakeup clear_logs.sh
 
 # 运行
 echo "Running wakeup......" >> log.txt

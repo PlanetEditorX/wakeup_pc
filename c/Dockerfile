@@ -18,11 +18,11 @@ FROM alpine:3.18.6
 
 # 从构建阶段复制静态编译的可执行文件到最终镜像
 COPY --from=builder /app/wakeup /app/
-COPY start.sh config.ini crontab /app/
+COPY start.sh clear_logs.sh config.ini crontab /app/
 # 设置工作目录
 WORKDIR /app
 RUN apk add --no-cache sshpass openssh && \
-    chmod +x ./start.sh
+    chmod +x start.sh
 
 # 设置容器启动时执行的命令
-CMD ["./start.sh"]
+CMD ["start.sh"]

@@ -1,1 +1,4 @@
-0 */1 * * * ps | grep wakeup.py | grep -v grep | awk '{print $1}' | xargs kill -9; nohup /usr/bin/python3 -u /wakeup.py 1 > /log.txt &
+# 每个小时重启连接
+0 */1 * * * ps | grep wakeup | grep -v grep | awk '{print $1}' | xargs kill -9; nohup /app/wakeup 1 > /log.txt &
+# 每天凌晨1点检查日志大小
+0 1 * * * /app/clear_logs.sh
