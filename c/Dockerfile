@@ -25,4 +25,4 @@ RUN apk add --no-cache sshpass openssh && \
     chmod +x start.sh
 
 # 设置容器启动时执行的命令
-CMD ["start.sh"]
+CMD ["./start.sh"]

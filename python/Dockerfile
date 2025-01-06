@@ -34,4 +34,4 @@ RUN apk add  --no-cache openssh cronie sshpass && \
     chmod +x start.sh
 
 # # 使用 start.sh 作为 CMD 指令
-CMD ["start.sh"]
+CMD ["./start.sh"]
