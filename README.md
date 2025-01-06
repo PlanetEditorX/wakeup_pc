@@ -1,73 +1,180 @@
-# 利用小爱同学控制局域网电脑开关机（docker/iStoreOS）
+# 利用小爱同学控制局域网电脑开关机
 
 ---
-转移至`p2c`分支：https://github.com/PlanetEditorX/wakeup_pc/tree/p2c
+
 ### 一、使用docker
 
 ---
 
 #### （一）远程拉取（推荐）
 ##### 1. 拉取镜像
-```bash
-docker pull yexundao/wakeup_pc:latest
-```
-##### 2. 创建配置文件
-（1）在指定位置创建config.ini文件，如：`/vol1/1000/docker/wakeup/config.ini`
 
-（2）按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini ，配置详情查看”使用iStoreOS“→“修改配置文件”。
+- x86/arm64
+  ```bash
+  docker pull yexundao/wakeup_pc:latest
+  ```
+
+  - 使用`Publish Docker image`手动构建或直接打上tags自动构建
+  - x86和arm64都可以使用，默认推荐镜像。
+
+- arm64
+  ```bash
+  docker pull yexundao/wakeup_pc:latest-arm
+  ```
+
+  - 使用`Publish Docker image by self-hosted runner`手动构建下才使用这种镜像。
+  - 这种方式需要配置好自己的arm服务器的自建runner，连接仓库后arm版本在本地构建。
+  - 自建runner安装方式参考 https://github.com/PlanetEditorX/wakeup_pc/settings/actions/runners/new 和 [在ARMbian系统上将自托管运行器注册为系统服务并使其在后台运行](attachment/在ARMbian系统上将自托管运行器注册为系统服务并使其在后台运行.md)
+  - 不管哪种方式x86都可以使用，区别是使用`by self-hosted runner`方式将arm版本给区别出来，arm只能使用`latest-arm`镜像。
+
+- 默认镜像latest为C编译好的，1.8.0即之后的版本都是C编译版本，需要python版本需要手动执行Publish Docker Image Python的Actions
+- 镜像体积缩小到十几兆，完全符合日常轻度使用。![image-20250101171824717](attachment/image-20250101171824717.png)
+
+
+##### 2. 创建配置文件
+- 在任意指定位置创建`config.ini`文件，如：
+  - x86：`/vol1/1000/docker/wakeup/config.ini`
+  - arm64：`/root/soft/wakeup/config.ini`
+
+- 按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini
+- 在本地调试时，可通过指令忽略配置文件，避免配置上传到仓库`git update-index --assume-unchanged ~/wakeup_pc/docker/config.ini`
 
 ##### 3. 运行镜像
-```bash
-docker run -d \
-  --name wakeup_pc \
-  -v /vol1/1000/docker/wakeup/config.ini:/config.ini \
-  --restart always \
-  --network host \
-  yexundao/wakeup_pc:latest
-```
+
+- 带日志和配置命令启动
+
+  - 在宿主机配置文件目录下提前建立日志文件，如：
+    
+    - x86：`touch /vol1/1000/docker/wakeup/log.txt`
+    
+    - arm64：`touch /root/soft/wakeup/log.txt`
+    
+    - 注意：如果带日志命令却没有创建日志文件，docker容器将会自动创建一个`log.txt`的目录，无法正常输出日志
+    
+  - 创建并启动容器
+
+    - x86
+      ```bash
+      docker run -d \
+        --name wakeup_pc \
+        -v /vol1/1000/docker/wakeup/config.ini:/app/config.ini \
+        -v /vol1/1000/docker/wakeup/log.txt:/app/log.txt \
+        --restart always \
+        --network host \
+        yexundao/wakeup_pc:latest
+      ```
+
+    - arm64
+      ```bash
+      docker run -d \
+        --name wakeup_pc \
+        -v /root/soft/wakeup/config.ini:/app/config.ini \
+        -v /root/soft/wakeup/log.txt:/app/log.txt \
+        --restart always \
+        --network host \
+        yexundao/wakeup_pc:latest
+      ```
+
+      或自建runner版本
+
+      ```bash
+      docker run -d \
+        --name wakeup_pc \
+        -v /root/soft/wakeup/config.ini:/app/config.ini \
+        -v /root/soft/wakeup/log.txt:/app/log.txt \
+        --restart always \
+        --network host \
+        yexundao/wakeup_pc:latest-arm
+      ```
+
+- 仅配置命令
+  ```bash
+  docker run -d \
+    --name wakeup_pc \
+    -v /vol1/1000/docker/wakeup/config.ini:/app/config.ini \
+    --restart always \
+    --network host \
+    yexundao/wakeup_pc:latest
+  ```
 
 - 需要先根据自己的具体信息配置好config.ini文件
+
 - 将运行命令中`/vol1/1000/docker/wakeup/config.ini`修改为自己实际配置文件地址
+
+- 注意，这里容器里的目录位置是/app/
+
+- 如果需要查看输出日志，可进入容器排查
+  ```bash
+  docker exec -it wakeup_pc sh
+  ```
+
+  <div style="text-align: left;">
+      <img src="attachment/image-20250101172542475.png" alt="description">
+  </div>
+
+- 如果是带日志的命令启动，可直接在docker的宿主机查看日志
+  ```bash
+  tail -f /vol1/1000/docker/wakeup/log.txt
+  ```
+
+  <div style="text-align: left;">
+      <img src="attachment/image-20250101173848545.png" alt="description">
+  </div>
+
+- 如果是空日志文件，则第一行输出关机命令的参数，如`cmd_shutdown: sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@IP 'shutdown /s /t 10'`，可通过对比相关数据和config.ini的参数是否匹配，如果为空则说明参数读取异常，检查config.ini配置文件的内容和位置是否正确。
+
+- 和巴法云建立TCP连接
+  ```shell
+  The IP address of bemfa.com is: 119.91.109.180
+  Heartbeat sent
+  recv: cmd=1&res=1
+  ```
+
+  会向巴法云的IP发送TCP请求，看返回的是否是`recv: cmd=1&res=1`，全是1才是订阅主题成功，其它情况检查是否参数异常。
+
 
 
 ---
 
 #### （二）本地构建
-##### 1. 创建 Dockerfile
-- 创建一个Dockerfile来构建alpine 容器，并在其中设置你的 Python 脚本。
+
+##### 1.环境
+
+- 由于是在Linux上进行的开发，所以wakeup.c文件的部分头文件会报错，如果是WIN进行编译修改可能需要转为Windows的替代头文件
+
+##### 2. 创建 Dockerfile
+- 创建一个Dockerfile来构建alpine 容器，并在其中设置脚本。
 ```Dockerfile
-FROM alpine:latest
+# 使用alpine作为基础镜像，并安装必要的编译工具和库
+FROM alpine:3.18.6 as builder
 
-#安装必要依赖
-RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-RUN apk update
-RUN apk add --no-cache python3 curl openssh wakeonlan cronie sshpass
+# 安装musl-dev和libc-dev，它们包含了C标准库的头文件和静态库
+RUN apk add --no-cache musl-dev libc-dev gcc
 
-# 将脚本复制到容器中
-COPY wakeup.py /wakeup.py
-# 使脚本可执行
-RUN chmod +x /wakeup.py
+# 设置工作目录
+WORKDIR /app
 
-# 复制配置文件
-COPY config.ini /config.ini
+# 复制源代码和配置文件到工作目录
+COPY wakeup.c config.ini /app/
 
-# cron定时任务
-ADD crontab /crontab
-RUN /usr/bin/crontab /crontab
+# 静态编译C程序，确保使用静态链接
+RUN gcc -static -o wakeup wakeup.c
 
-# 将 start.sh 脚本复制到容器中
-COPY start.sh /start.sh
+# 使用alpine作为最终的基础镜像
+FROM alpine:3.18.6
 
-# 使脚本可执行
-RUN chmod +x /start.sh
+# 从构建阶段复制静态编译的可执行文件到最终镜像
+COPY --from=builder /app/wakeup /app/
+COPY start.sh config.ini crontab /app/
+# 设置工作目录
+WORKDIR /app
+RUN apk add --no-cache sshpass openssh && \
+    chmod +x ./start.sh
 
-# 清理缓存
-RUN apk cache clean
-
-# 使用 start.sh 作为 CMD 指令
-CMD ["/start.sh"]
+# 设置容器启动时执行的命令
+CMD ["./start.sh"]
 ```
-##### 2. 构建 Docker 镜像
+##### 3. 构建 Docker 镜像
 - 使用以下命令构建 Docker 镜像，该命令将会创建一个名为wakeup_pc的本地镜像：
 ```bash
 docker build -t wakeup_pc .
@@ -75,13 +182,15 @@ docker build -t wakeup_pc .
 ```bash
 docker images
 ```
-  ![](attachment/20aa907b4147fc9a0063dd9b5ad5fa65e826a7e001065c86e2ac890a6f589d5c.png)
+![image-20250101174959871](attachment/image-20250101174959871.png)
 
-##### 3. 创建配置文件
+- 如果多次构建，会产生很多标签为`none`的镜像，使用命令`docker rmi $(docker images -f "dangling=true" -q)`删除无用镜像。
+
+##### 4. 创建配置文件
 - 从仓库https://github.com/PlanetEditorX/wakeup_pc/tree/main/docker 中获取并保存在Linux主机上
     ![](attachment/6bf0e7d8b2602710526d63e25efd9d385cd60c4f5a804008d3124d18ec03f8a0.png)
 - config.ini详情见远程拉取和iStoreOS的配置文件相关说明
-##### 4. 运行 Docker 容器
+##### 5. 运行 Docker 容器
 ```bash
 docker run -d --restart=unless-stopped --name wakeup_pc --network host wakeup_pc
 ```
@@ -96,20 +205,21 @@ docker exec -it wakeup_pc sh
 ```
 
 ---
+#### （三）利用Actions构建docker镜像
 
-### 二、使用iStoreOS
+##### 1. <span class='custom-title-span'>按照说明逐一修改配置文件</span>
 
----
-#### （一）创建文件夹
-> - 在任意位置创建文件夹，如：  `mkdir /etc/wakeup`
+- 主要为两个流程`Publish Docker Image C` 和 `Publish Docker Image Python`，`Publish Docker Image main`实际指向C，只是增加了tags触发。
+  ![image-20250103150452629](attachment/image-20250103150452629.png)
 
----
-#### （二）上传配置文件
-- 从仓库中下载并上传config.ini和wakeup.py
-  ![](attachment/0295ff457e8b9fc46ba3ccecd9b45e972f2331e5d758d44fe1e79a27705df1ba.png)
+- 选择哪种语言直接点击工作流后，点击Run workflow就可以创建并推送对应语言的镜像到Docker Hub，实际使用并无多大差别，直接拉取最新的`latest`镜像就可以，无需在意具体的版本
 
----
-#### （三）修改配置文件
+![image-20250103150936440](attachment/image-20250103150936440.png)
+
+![image-20250103151210735](attachment/image-20250103151210735.png)
+
+#### （四）修改配置文件
+
 ##### 1. <span class='custom-title-span'>按照说明逐一修改配置文件</span>
 ##### 2. 巴法云私钥/client_id
 - ![](attachment/edbafcef17a510c7a8458197b5457e0db13bece2a8efa74a5a62f44d5aad4dca.png)
@@ -129,35 +239,8 @@ docker exec -it wakeup_pc sh
 - 设置的用户密码
 
 ---
-#### （四）安装依赖
-```bash
-opkg update
-opkg install wakeonlan python3 sshpass
-```
 
----
-#### （五）开机启动
-- 在系统-启动项-本地启动脚本中添加代码，让其开机启动
-```bash
-nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
-```
- ![](attachment/97d06dbdbc6cd4a8c430f8a23be76cbd9ddf3c5751cab18a2717b2e059826f8e.png)
-
----
-#### （六）计划任务
-- 在系统-计划任务中添加任务，作用是每个小时，会kill掉wakeup.py的后台进程，并重新启动一个新的进程，防止长时间掉线。
-```bash
-0 */1 * * * ps | grep wakeup.py | grep -v grep | awk '{print $1}' | xargs kill -9; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
-```
- ![](attachment/4d407b391e1c47e842d87406441ca463f04df4e2279c4122b6820174289ed1af.png)
-
----
-#### （七）生效操作
-- 重启或来到系统-启动项-启动脚本，`ctrl+f` 搜索 `cron`，并点击重启，使计划任务生效
-
----
-
-### 三、SSH服务器配置
+### 二、SSH服务器配置
 
 ---
 #### （一）启用OpenSSH
@@ -210,7 +293,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 ##### 1. <span class='custom-title-span'>适当的限制权限，避免别人获取这个账号后用这个账号使用电脑，参考[https://www.ithome.com/0/228/192.htm](https://post.smzdm.com/p/akxwkxqk/)</span>
 ##### 2. 按教程走，主要就是 `限制此用户登录到系统上：“拒绝本地登录”和“拒绝通过远程桌面服务登录”`，避免有意或无意中登录电脑，在电脑中留下无用的用户文件，其它安全配置看情况，一般局域网用户也用不着过于严密
 
-### 四、巴法云
+### 三、巴法云
 
 ---
 
@@ -251,41 +334,15 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 ---
 
-### 五、docker和iStoreOS对比
+### 四、iStoreOS
 
----
+查看py分支相关介绍，本之分支主要适用于docker https://github.com/PlanetEditorX/wakeup_pc/tree/py?tab=readme-ov-file#%E4%BA%8C%E4%BD%BF%E7%94%A8istoreos
 
-#### （一）docker
-
-##### 优势
-
-- 已有docker环境下配置快速，简单
-- 不受限于设备环境，几乎任何设备都是一样的操作
-
-##### 劣势
-
-- 占用空间较大（100MB左右）
-- 需要提前配置好docker网络环境，需要一点点docker相关的知识或能根据故障自己进行搜索排查
 
 
 ---
 
-#### （二）iStoreOS
-
-##### 优势
-
-- 软件利用率高，本身系统安装的软件包在其它程序也可以使用
-- 新增占用空间较小，安装受网络环境影响小
-
-##### 劣势
-
-- 配置较慢，较繁琐
-- 可能存在使用不同Openwrt版本而出现有人配置成功，有人配置不成功或并不知道自己哪里出错的情况
-- 可能会出现用着用着突然无法使用的情况，重启也没用，软件包重装又正常.......
-
----
-
-### 六、更新docker镜像
+### 五、更新docker镜像
 
 ---
 
@@ -293,35 +350,67 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 ##### 触发
 
-```dockerfile
+```yml
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '输入版本号，格式为X.Y.Z'
+        required: true
+        default: ''
 ```
 - 打上`V*`标签并推送自动触发操作
   ```bash
-  git tag -a v1.8.0 -m "Release version 1.8.0"
+  git tag -a v2.0.0 -m "Release version 2.0.0"
   git push --tags
   ```
-  - 根据需要修改`v1.8.0`→`va.b.c`和之后的描述
-  - `v1.8.0`/`va.b.c`在工作流中将会提取`1.8.0`/`a.b.c`作为标签打在镜像上，镜像上将会同时有两个tags：`1.8.0`/`a.b.c`和`latest`
+  - 根据需要修改`v2.0.0`→`va.b.c`和之后的描述
+  - `v2.0.0`/`va.b.c`在工作流中将会提取`v2.0.0`/`a.b.c`作为标签打在镜像上，镜像上将会同时有两个tags：`v2.0.0`/`a.b.c`和`latest`
 
-##### 标签的获取
-```dockerfile
+- `workflow_dispatch`是页面的`Run workflow`操作，输入的值保存在参数`github.event.inputs.version`中。
+
+##### 多平台镜像的action
+
+```yml
+- name: Set up QEMU
+  uses: docker/setup-qemu-action@v3
+
+- name: Set up Docker Buildx
+  uses: docker/setup-buildx-action@v3
+```
+
+##### 版本的获取
+
+```yml
+- name: Use tags or version
+  id: final_tags
+  run: |
+    if [ -z "${{ github.event.inputs.version }}" ]; then
+      echo "tags=${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+    else
+      echo "tags=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+    fi
+```
+
+- 从页面输入或tags中获取版本信息
+
+```yml
 - name: Extract metadata (tags, labels) for Docker
   id: meta
   uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
   with:
-    images: 用户名/镜像名字
+    images: yexundao/wakeup_pc
     tags: |
-          type=semver,pattern={{version}}
+          type=raw,value=${{ steps.final_tags.outputs.tags }}
           type=raw,value=latest
 ```
-- 根据实际参数修改对应的名字，可直接在Docker Hub的镜像发布页查看
+- 根据实际参数修改对应的名字，可直接在Docker Hub的镜像发布页查看对应的版本号
 
 ##### Docker Hub的登录
-```dockerfile
+```yml
 - name: Log in to Docker Hub
   uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
   with:
@@ -335,18 +424,19 @@ on:
   - 密码参数为：`Name`：`DOCKER_PASSWORD`，`Secret`：`Docker Hub的密码`
 
 ##### 运行目录的配置
-```dockerfile
-- name: Build and push Docker image
-  id: push
-  uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+```yml
+- name: Build and push
+  uses: docker/build-push-action@v5
   with:
     context: ./docker
     file: ./docker/Dockerfile
+    platforms: linux/amd64,linux/arm64
     push: true
     tags: ${{ steps.meta.outputs.tags }}
     labels: ${{ steps.meta.outputs.labels }}
 ```
-- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改`context`和`file`为对应的路径
+- 修改运行目录，由于Dockerfile文件是存在于仓库的`/docker/Dockerfile`位置，需要同时修改`context`和`file`为对应的路径。
+- 在`platforms: linux/amd64,linux/arm64`中指定了构造平台。
 
 ---
 
@@ -368,5 +458,9 @@ on:
 
 #### （三）docker无法唤醒电脑
 - 可能原因
-  - 进入容器内部，手动执行唤醒代码，如失败则说明可能是docker的网络环境出问题，无法访问到局域网设备，检查并重新设置docker网络配置
+  - 进入容器内部，手动执行唤醒代码，如失败则说明可能是docker的网络环境出问题，无法访问到局域网设备，检查并重新设置docker网络配置。
 
+#### （四）docker无法关闭电脑
+
+- 可能原因
+  - 可查看日志的第一行，如`cmd_shutdown: sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@IP 'shutdown /s /t 10'`在容器内手动执行` sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@IP 'shutdown /s /t 10'`查看是否能够执行成功关闭电脑，可能是网络环境的问题，也可能是Windows的SSH配置问题。
