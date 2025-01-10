@@ -432,8 +432,89 @@ docker exec -it wakeup_pc sh
 
 ### 六、iStoreOS
 
-查看py分支相关介绍，本之分支主要适用于docker https://github.com/PlanetEditorX/wakeup_pc/tree/py?tab=readme-ov-file#%E4%BA%8C%E4%BD%BF%E7%94%A8istoreos
+#### （一）创建文件夹
 
+> - 在任意位置创建文件夹，如：  `mkdir /etc/wakeup`
+
+---
+
+#### （二）上传配置文件
+
+- 从仓库中下载并上传config.ini和wakeup.py
+  ![](attachment/0295ff457e8b9fc46ba3ccecd9b45e972f2331e5d758d44fe1e79a27705df1ba.png)
+
+---
+
+#### （三）修改配置文件
+
+##### 1. <span class='custom-title-span'>按照说明逐一修改配置文件</span>
+
+##### 2. 巴法云私钥/client_id
+
+- ![](attachment/edbafcef17a510c7a8458197b5457e0db13bece2a8efa74a5a62f44d5aad4dca.png)
+
+##### 3. 主题值/topic
+
+- ![](attachment/ec00e02c5afe8156849b147c4dc67ef840b8883d6697d428f58d8cfafe26287e.png)
+
+##### 4. 设备MAC地址/mac
+
+（1）需要唤醒的设备输入：`ipconfig /all`，找到支持唤醒的网卡的物理地址，注意：如果显示的物理地址为XX-XX-XX-XX-XX-XX，需要将短横杠替换为冒号，XX:XX:XX:XX:XX:XX
+![](attachment/b0ac334a7df49d4540ffb28c251eb3249de04ebf240f8f7b362bac89e737e053.png)
+
+##### 5. 远程电脑IP地址/ip
+
+（1）需要唤醒的设备输入：`ipconfig`，根据自己的网卡找到IP地址
+ ![](attachment/ccbf0a8dbf57c64da091c6cb5d15499633906e866843e7bc5a910b25a457d3fa.png)
+
+##### 6. 远程SSH用户账号/user
+
+- 设置的用户名
+
+##### 7. 远程SSH用户密码/password
+
+- 设置的用户密码
+
+---
+
+#### （四）安装依赖
+
+```bash
+opkg update
+opkg install wakeonlan python3 sshpass
+```
+
+---
+
+#### （五）开机启动
+
+- 在系统-启动项-本地启动脚本中添加代码，让其开机启动
+
+```bash
+nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
+```
+
+ ![](attachment/97d06dbdbc6cd4a8c430f8a23be76cbd9ddf3c5751cab18a2717b2e059826f8e.png)
+
+---
+
+#### （六）计划任务
+
+- 在系统-计划任务中添加任务，作用是每个小时，会kill掉wakeup.py的后台进程，并重新启动一个新的进程，防止长时间掉线。
+
+```bash
+0 */1 * * * ps | grep wakeup.py | grep -v grep | awk '{print $1}' | xargs kill -9; nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
+```
+
+ ![](attachment/4d407b391e1c47e842d87406441ca463f04df4e2279c4122b6820174289ed1af.png)
+
+---
+
+#### （七）生效操作
+
+- 重启或来到系统-启动项-启动脚本，ctrl+f 搜索 cron，并点击重启，使计划任务生效
+
+  
 
 
 ---
