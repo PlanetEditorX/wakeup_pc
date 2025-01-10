@@ -36,7 +36,7 @@
   - x86：`/vol1/1000/docker/wakeup/config.ini`
   - arm64：`/root/soft/wakeup/config.ini`
 
-- 按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/docker/config.ini
+- 按照配置文件说明进行相应的配置，可在仓库查找模板或直接保存 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/c/config.ini
 - 在本地调试时，可通过指令忽略配置文件，避免配置上传到仓库`git update-index --assume-unchanged ~/wakeup_pc/docker/config.ini`
 
 ##### 3. 运行镜像
@@ -188,7 +188,7 @@ docker images
 - 如果多次构建，会产生很多标签为`none`的镜像，使用命令`docker rmi $(docker images -f "dangling=true" -q)`删除无用镜像。
 
 ##### 4. 创建配置文件
-- 从仓库https://github.com/PlanetEditorX/wakeup_pc/tree/main/docker 中获取并保存在Linux主机上
+- 从仓库 https://raw.githubusercontent.com/PlanetEditorX/wakeup_pc/refs/heads/main/c/config.ini 中获取并保存在Linux主机上
     ![](attachment/6bf0e7d8b2602710526d63e25efd9d385cd60c4f5a804008d3124d18ec03f8a0.png)
 - config.ini详情见远程拉取和iStoreOS的配置文件相关说明
 ##### 5. 运行 Docker 容器
