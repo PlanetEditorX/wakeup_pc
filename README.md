@@ -261,7 +261,7 @@ docker exec -it wakeup_pc sh
 
 ##### 1. Windows开启ssh服务器
 
-##### 2.通过页面或其它方式进入终端
+##### 2.通过页面或其它方式进入home assistant的docker终端
 
 - 安装sshpass：`apk add sshpass`
 
@@ -514,7 +514,7 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 - 重启或来到系统-启动项-启动脚本，ctrl+f 搜索 cron，并点击重启，使计划任务生效
 
-  
+
 
 
 ---
