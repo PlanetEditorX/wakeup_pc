@@ -238,9 +238,102 @@ docker exec -it wakeup_pc sh
 ##### 7. 远程SSH用户密码/password
 - 设置的用户密码
 
+  
+
 ---
 
-### 二、SSH服务器配置
+### 二、使用home assistant
+
+---
+
+#### （一）安装home assistant
+
+##### 1. 使用飞牛OS的应用中心安装
+
+##### 2.使用docker自行安装
+
+- https://www.home-assistant.io/installation/linux
+
+#### （二）文件配置
+
+##### 1. Windows开启ssh服务器
+
+##### 2.通过页面或其它方式进入终端
+
+- 安装sshpass：`apk add sshpass`
+
+  - 不直接使用密钥免密登录的原因：密钥方式虽然较直接携带密码的ssh方式更加安全，但通用性不足。特别是要docker和home assistant都使用的情况下，docker每次重新创建不必手动添加密钥到主机上。而且本身是创建了一个专用的ssh账户来管理关机事项，对于局域网来说，安全已经足够，不至于担心密码泄露的问题，没必要。
+
+- 终端修改`configuration.yaml`文件，或打开飞牛OS的`文件管理`-`应用文件`-`home-assistantan`-`config`-`configuration.yaml`，在文件末尾添加
+
+  - ```yaml
+    switch:
+      - platform: wake_on_lan
+        name: "PC1"                     		# 定义HA中实体的名称
+        mac: "00:00:00:00:00:00"                # 主机MAC地址
+        host: "192.168.3.X"                     # 主机IP地址
+        broadcast_address: "255.255.255.255"    # 广播地址
+        broadcast_port: 9               		# 指定wol端口
+        turn_off:
+          service: shell_command.shutdown
+    shell_command:
+      shutdown: "sshpass -p SSH密码 ssh -A -g -o StrictHostKeyChecking=no SSH用户名@192.168.3.X \"shutdown -s -t 10\""         # 运行的关机命令
+    ```
+
+- 来到`home assistant`的`开发者工具`，在`配置检查与重启`中点击`检查配置`，显示`配置不会阻止 Home Assistant 启动！`后点击`重新启动`，点击`重新启动Home Assistant`后等待重启
+
+#### （三）配置页面
+
+##### 1. 查看是否配置成功
+
+- 在`设置`-`设置与服务`-`实体`中查看是否有自定义的实体名称比如`PC1`，是一个按钮形式，点击切换查看能否开关电脑。
+
+##### 2.首页配置按钮
+
+- 在`概览`中点击右上角的编辑（铅笔）按钮，点击`添加卡片`，切换到`按实体`页面，搜索`PC1`，将其添加到首页。
+
+##### 3.添加到iPhone家庭
+
+- 到`HomeKit Bridge`点击`添加条目`，`要包含的域`就选择`Switch`，点击`提交`
+- 在`集成条目`中新增加的项的右侧，点击`配置`，`包含模式`选择`include`，要包含的域选择`Switch`，点击提交
+- 实体搜索`PC1`，选择后提交
+- `通知`会显示`HomeKit Pairing`的二维码，iPhone家庭扫描添加
+
+##### 4.手机端设置
+
+- 为了更好的语音唤醒，可以手动修改下配件的名字
+- 长按添加的唤醒组件，点击右下角的齿轮，编辑`房间`和`名称`，比如这里可以为`卧室`和`电脑`
+- 在`设置`的`控制中心`中添加`家庭`到`控制中心`
+
+
+
+---
+
+### 三、配置成功
+
+---
+
+##### 1. 网页控制
+
+- 巴法手动发送`on`或`off`控制开关机（可远程）
+- 在`Home Assistant`点击按钮开关切换开关机
+
+##### 2.App控制
+
+- 巴法客户端控制（可远程）
+- `Home Assistant`手机客户端点击按钮开关切换开关机
+- iPhone`家庭`中或`控制中心`中快捷控制开关机
+
+##### 3.语音控制
+
+- 小爱同学语音控制：`小爱同学，打开电脑`、`小爱同学，关闭电脑`
+- Siri语音控制：`嗨,Siri，打开卧室电脑`、`嗨,Siri，关闭卧室电脑`
+
+
+
+---
+
+### 四、SSH服务器配置
 
 ---
 #### （一）启用OpenSSH
@@ -293,7 +386,7 @@ docker exec -it wakeup_pc sh
 ##### 1. <span class='custom-title-span'>适当的限制权限，避免别人获取这个账号后用这个账号使用电脑，参考[https://www.ithome.com/0/228/192.htm](https://post.smzdm.com/p/akxwkxqk/)</span>
 ##### 2. 按教程走，主要就是 `限制此用户登录到系统上：“拒绝本地登录”和“拒绝通过远程桌面服务登录”`，避免有意或无意中登录电脑，在电脑中留下无用的用户文件，其它安全配置看情况，一般局域网用户也用不着过于严密
 
-### 三、巴法云
+### 五、巴法云
 
 ---
 
@@ -334,7 +427,7 @@ docker exec -it wakeup_pc sh
 
 ---
 
-### 四、iStoreOS
+### 六、iStoreOS
 
 查看py分支相关介绍，本之分支主要适用于docker https://github.com/PlanetEditorX/wakeup_pc/tree/py?tab=readme-ov-file#%E4%BA%8C%E4%BD%BF%E7%94%A8istoreos
 
@@ -342,7 +435,7 @@ docker exec -it wakeup_pc sh
 
 ---
 
-### 五、更新docker镜像
+### 七、更新docker镜像
 
 ---
 
@@ -440,7 +533,7 @@ on:
 
 ---
 
-### 七、故障排除（更新...）
+### 八、故障排除（更新...）
 
 ---
 
