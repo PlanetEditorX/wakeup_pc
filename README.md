@@ -217,7 +217,7 @@ docker exec -it wakeup_pc sh
 
 ![image-20250103150936440](attachment/image-20250103150936440.png)
 
-![image-20250110111640950](attachment/image-20250110111640950.png)
+![image-20250110122546652](attachment/image-20250110122546652.png)
 
 ---
 
