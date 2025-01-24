@@ -1,4 +1,4 @@
-# 利用小爱同学/Siri控制局域网电脑开关机
+![image](https://github.com/user-attachments/assets/d5de2f74-d7e9-4f7a-9d8f-c107737cf24b)# 利用小爱同学/Siri控制局域网电脑开关机
 
 ---
 
@@ -516,10 +516,36 @@ nohup /usr/bin/python3 -u /etc/wakeup/wakeup.py 1 > /etc/wakeup/log.txt 2>&1 &
 
 
 
+---
+
+### 七、home assistant
 
 ---
 
-### 七、更新docker镜像
+#### （一）修改configuration.yaml文件
+
+- ```bash
+  switch:
+  - platform: wake_on_lan
+    name: "PC1"                     # 定义HA中实体的名称,可任意命名
+    mac: "XX:XX:XX:XX:XX:XX"        # 主机(电脑)的MAC地址
+    host: "192.168.3.XX"            # 主机(电脑)地址,可省略
+    broadcast_address: "255.255.255.255"      # 广播地址.不可省略.此处假设路由器地址为192.168.3.1,如为其他网段需要修改
+    broadcast_port: 9               # 指定wol端口,可省略
+    turn_off:
+      service: shell_command.shutdown
+  
+  shell_command:
+    shutdown: "sshpass -p 密码 ssh -A -g -o StrictHostKeyChecking=no 用户名@192.168.3.XX \"shutdown -s -t 10\""  # 替换为你的Linux命令
+  ```
+  #### （二）添加按钮到页面
+  ![image](https://github.com/user-attachments/assets/20bb4777-0994-4438-adae-b676799a2291)
+
+
+
+---
+
+### 八、更新docker镜像
 
 ---
 
@@ -617,7 +643,7 @@ on:
 
 ---
 
-### 八、故障排除（更新...）
+### 九、故障排除（更新...）
 
 ---
 
