@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/d5de2f74-d7e9-4f7a-9d8f-c107737cf24b)# 利用小爱同学/Siri控制局域网电脑开关机
+# 利用小爱同学/Siri控制局域网电脑开关机
 
 ---
 
