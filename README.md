@@ -64,7 +64,21 @@
         --network host \
         yexundao/wakeup_pc:latest
       ```
+      或在想要的位置上创建docker-compose.yml文件
 
+      ```bash
+      version: "3.8"
+      
+      services:
+        wakeup_pc:
+          image: yexundao/wakeup_pc:latest
+          container_name: wakeup_pc
+          restart: always
+          network_mode: host
+          volumes:
+            - ./config.ini:/app/config.ini
+            - ./log.txt:/app/log.txt
+      ```
     - arm64
       ```bash
       docker run -d \
