@@ -215,8 +215,8 @@ int wol(const char *mac)
 // 初始化命令
 void init_cmd()
 {
-    // #局域网连接openssh服务器，进行关机操作
-    snprintf(cmd_shutdown, sizeof(cmd_shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /s /t 10'", config.password, config.user, config.ip);
+    // #局域网连接openssh服务器，进行关机操作 /h表示关机断电
+    snprintf(cmd_shutdown, sizeof(cmd_shutdown), "sshpass -p %s ssh -A -g -o StrictHostKeyChecking=no %s@%s 'shutdown /h /t 10'", config.password, config.user, config.ip);
     // 打印命令
     printf("cmd_shutdown: %s\n", cmd_shutdown);
 }
@@ -422,28 +422,28 @@ void process_data(char *recvData)
         char pc_status = check_url(config.ip, 22, 3);
         if (strncmp(state, "on", 2) == 0)
         {
-            printf("正在打开电脑...\n");
+            printf("正在打开linux系统...\n");
             if (pc_status)
             {
-                printf("当前目标PC在线,无须执行开机指令.\n");
+                printf("当前目标linux在线,无须执行开机指令.\n");
             }
             else
             {
                 // 网络唤醒
                 if (wol(config.mac) >= 0)
                 {
-                    printf("电脑开机指令发送成功!\n");
+                    printf("linux系统开机指令发送成功!\n");
                 }
                 else
                 {
-                    printf("电脑开机指令发送失败!\n");
+                    printf("linux系统开机指令发送失败!\n");
                 }
             }
         }
         else if (strncmp(state, "off", 3) == 0)
         {
             // 检查是否以 "off" 开头
-            printf("正在关闭电脑\n");
+            printf("正在关闭linux系统\n");
             if (pc_status)
             {
                 printf("执行命令: %s\n", cmd_shutdown);
