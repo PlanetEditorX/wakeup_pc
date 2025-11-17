@@ -54,7 +54,7 @@ try:
 	ssh_password = config.get('openssh', 'password').strip('"')
 	ssh_down = config.get('openssh', 'shutdown')
 	# 局域网连接openssh服务器，进行关机操作
-	cmd_shutdown = 'sshpass -p %(password)s ssh -A -g -o StrictHostKeyChecking=no %(user)s@%(ip)s ${ssh_down}'%{"password": ssh_password, "user": ssh_user, "ip": ssh_ip}
+	cmd_shutdown = 'sshpass -p %(password)s ssh -A -g -o StrictHostKeyChecking=no %(user)s@%(ip)s '+ssh_down+%{"password": ssh_password, "user": ssh_user, "ip": ssh_ip}
 	print(f"cmd_shutdown={cmd_shutdown}")
 except:
 	time.sleep(2)
